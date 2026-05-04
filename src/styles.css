@@ -1,1 +1,36 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables CSS pour les tokens sémantiques (version light par défaut) */
+:root {
+  --color-primary: #534AB7;         /* purple-600 */
+  --color-primary-hover: #3C3489;   /* purple-800 */
+  --color-primary-light: #EEEDFE;   /* purple-50 */
+  --color-primary-text: #26215C;    /* purple-900 */
+
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F8F8FB;
+  --color-border: #E5E4F0;
+  --color-muted: #7C7A8E;
+}
+
+/* Override pour le dark mode (si préférence système : dark) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface: #13121F;
+    --color-surface-2: #1C1B2E;
+    --color-border: #2E2C45;
+    --color-muted: #9E9CB8;
+  }
+}
+
+/* Optionnel : tu peux aussi définir des classes utilitaires personnalisées si besoin */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white rounded-md px-4 py-2 transition-colors;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+  }
+}

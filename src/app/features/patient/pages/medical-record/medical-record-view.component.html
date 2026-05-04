@@ -1,0 +1,91 @@
+<div class="max-w-3xl mx-auto px-4 py-8">
+
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Mon dossier médical</h1>
+    <p class="text-sm text-muted mt-1">Informations médicales en lecture seule</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center py-24">
+      <svg class="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+      </svg>
+    </div>
+  } @else if (!record()) {
+    <div class="bg-surface rounded-lg border border-border px-6 py-12 text-center">
+      <p class="text-sm text-muted">Aucun dossier médical disponible.</p>
+    </div>
+  } @else {
+
+    <!-- Groupe sanguin -->
+    <div class="bg-surface rounded-lg border border-border p-6 mb-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-muted uppercase tracking-wide mb-1">Groupe sanguin</p>
+          <p class="text-3xl font-semibold text-primary">
+            {{ bloodTypeLabel(record()!.bloodType) }}
+          </p>
+        </div>
+        <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center">
+          <svg class="w-5 h-5 text-primary" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Allergies -->
+    <div class="bg-surface rounded-lg border border-border p-6 mb-4">
+      <p class="text-sm font-medium text-gray-900 mb-3">Allergies</p>
+      @if (record()!.allergies.length > 0) {
+        <div class="flex flex-wrap gap-2">
+          @for (allergy of record()!.allergies; track allergy) {
+            <span class="px-3 py-1 rounded-full text-sm bg-red-50 text-danger border border-red-100">
+              {{ allergy }}
+            </span>
+          }
+        </div>
+      } @else {
+        <p class="text-sm text-muted">Aucune allergie connue.</p>
+      }
+    </div>
+
+    <!-- Maladies chroniques -->
+    <div class="bg-surface rounded-lg border border-border p-6 mb-4">
+      <p class="text-sm font-medium text-gray-900 mb-3">Maladies chroniques</p>
+      @if (record()!.chronicDiseases.length > 0) {
+        <div class="flex flex-wrap gap-2">
+          @for (disease of record()!.chronicDiseases; track disease) {
+            <span class="px-3 py-1 rounded-full text-sm bg-primary-light text-primary border border-purple-100">
+              {{ disease }}
+            </span>
+          }
+        </div>
+      } @else {
+        <p class="text-sm text-muted">Aucune maladie chronique enregistrée.</p>
+      }
+    </div>
+
+    <!-- Notes médicales -->
+    <div class="bg-surface rounded-lg border border-border p-6">
+      <p class="text-sm font-medium text-gray-900 mb-4">Notes médicales</p>
+      @if (record()!.notes.length > 0) {
+        <div class="grid gap-3">
+          @for (note of record()!.notes; track note.id) {
+            <div class="border-l-2 border-primary pl-4 py-1">
+              <p class="text-sm text-gray-900 leading-relaxed">{{ note.content }}</p>
+              <p class="text-xs text-muted mt-1.5">
+                {{ note.createdAt | date:'d MMMM yyyy à HH:mm' : '' : 'fr' }}
+              </p>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-sm text-muted">Aucune note médicale disponible.</p>
+      }
+    </div>
+
+  }
+
+</div>

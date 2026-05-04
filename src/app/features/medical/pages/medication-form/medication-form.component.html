@@ -1,0 +1,105 @@
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Prescrire un médicament</h1>
+    <p class="text-sm text-muted mt-1">Nouveau traitement pour ce patient</p>
+  </div>
+
+  @if (error()) {
+    <div class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <div class="bg-surface rounded-lg border border-border p-6">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Médicament *</label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Ex: Metformine"
+            class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Dosage *</label>
+          <input
+            type="text"
+            formControlName="dosage"
+            placeholder="Ex: 500mg"
+            class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Fréquence *</label>
+        <select
+          formControlName="frequency"
+          class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
+                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+        >
+          @for (f of frequencies; track f.value) {
+            <option [value]="f.value">{{ f.label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Date de début *</label>
+          <input
+            type="date"
+            formControlName="startDate"
+            class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Date de fin</label>
+          <input
+            type="date"
+            formControlName="endDate"
+            class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
+        <textarea
+          formControlName="notes"
+          rows="3"
+          placeholder="Instructions particulières…"
+          class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
+                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+        ></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-3">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="px-4 py-2 text-sm font-medium text-muted rounded-md border border-border
+                 hover:bg-surface-2 transition-colors"
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          [disabled]="isLoading() || form.invalid"
+          class="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary
+                 hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        >
+          {{ isLoading() ? 'Enregistrement…' : 'Prescrire' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

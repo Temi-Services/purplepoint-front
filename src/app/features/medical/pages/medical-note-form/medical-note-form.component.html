@@ -1,0 +1,49 @@
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Ajouter une note médicale</h1>
+    <p class="text-sm text-muted mt-1">La note sera attachée au dossier du patient</p>
+  </div>
+
+  @if (error()) {
+    <div class="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <div class="bg-surface rounded-lg border border-border p-6">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Contenu de la note *</label>
+        <textarea
+          formControlName="content"
+          rows="6"
+          placeholder="Observations cliniques, résultats, recommandations…"
+          class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
+                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+        ></textarea>
+        @if (form.controls.content.invalid && form.controls.content.touched) {
+          <p class="mt-1 text-xs text-red-600">Minimum 10 caractères requis.</p>
+        }
+      </div>
+
+      <div class="flex items-center justify-end gap-3">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="px-4 py-2 text-sm font-medium text-muted rounded-md border border-border
+                 hover:bg-surface-2 transition-colors"
+        >
+          Annuler
+        </button>
+        <button
+          type="submit"
+          [disabled]="isLoading() || form.invalid"
+          class="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary
+                 hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        >
+          {{ isLoading() ? 'Enregistrement…' : 'Enregistrer la note' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

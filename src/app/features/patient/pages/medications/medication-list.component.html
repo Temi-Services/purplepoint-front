@@ -1,0 +1,49 @@
+<div class="max-w-3xl mx-auto px-4 py-8">
+
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold text-gray-900">Mes traitements</h1>
+    <p class="text-sm text-muted mt-1">Suivi de vos médicaments</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="border-b border-border mb-6">
+    <nav class="flex gap-1 -mb-px">
+      @for (tab of tabs; track tab.key) {
+        <button
+          (click)="setTab(tab.key)"
+          class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors"
+          [class]="activeTab() === tab.key
+            ? 'border-primary text-primary'
+            : 'border-transparent text-muted hover:text-gray-900'"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center py-24">
+      <svg class="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+      </svg>
+    </div>
+  } @else {
+    @if (medications().length === 0) {
+      <div class="bg-surface rounded-lg border border-border px-6 py-12 text-center">
+        <p class="text-sm text-muted">Aucun traitement {{ activeTab() === 'ACTIVE' ? 'en cours' : activeTab() === 'COMPLETED' ? 'terminé' : 'suspendu' }}.</p>
+      </div>
+    } @else {
+      <div class="grid gap-3 sm:grid-cols-2">
+        @for (med of medications(); track med.id) {
+          <pp-medication-card
+            [medication]="med"
+            (taken)="onTaken($event)"
+          />
+        }
+      </div>
+    }
+  }
+
+</div>

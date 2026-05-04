@@ -1,0 +1,79 @@
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+  <div class="mb-8">
+    <h1 class="text-2xl font-semibold text-gray-900">Administration</h1>
+    <p class="text-sm text-muted mt-1">Gestion des utilisateurs et des campagnes</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center py-24">
+      <svg class="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+      </svg>
+    </div>
+  } @else {
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+      <div class="bg-surface rounded-lg border border-border p-4">
+        <p class="text-xs text-muted mb-1">Utilisateurs</p>
+        <p class="text-2xl font-semibold text-gray-900">{{ totalUsers() }}</p>
+      </div>
+      <div class="bg-surface rounded-lg border border-border p-4">
+        <p class="text-xs text-muted mb-1">Patients</p>
+        <p class="text-2xl font-semibold text-gray-900">{{ totalPatients() }}</p>
+      </div>
+      <div class="bg-surface rounded-lg border border-border p-4">
+        <p class="text-xs text-muted mb-1">Employés terrain</p>
+        <p class="text-2xl font-semibold text-gray-900">{{ totalEmployees() }}</p>
+      </div>
+      <div class="bg-surface rounded-lg border border-border p-4">
+        <p class="text-xs text-muted mb-1">Campagnes</p>
+        <p class="text-2xl font-semibold text-gray-900">{{ totalCampaigns() }}</p>
+      </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="bg-surface rounded-lg border border-border p-6">
+        <h2 class="text-base font-medium text-gray-900 mb-1">Utilisateurs</h2>
+        <p class="text-sm text-muted mb-4">
+          Créer, modifier ou désactiver des comptes
+        </p>
+        <div class="flex gap-2">
+          <a routerLink="../users"
+             class="px-3 py-1.5 text-sm text-primary border border-primary rounded-md
+                    hover:bg-primary-light transition-colors">
+            Voir tout
+          </a>
+          <a routerLink="../users/new"
+             class="px-3 py-1.5 text-sm text-white bg-primary rounded-md
+                    hover:bg-primary-hover transition-colors">
+            + Créer
+          </a>
+        </div>
+      </div>
+
+      <div class="bg-surface rounded-lg border border-border p-6">
+        <h2 class="text-base font-medium text-gray-900 mb-1">Campagnes</h2>
+        <p class="text-sm text-muted mb-4">
+          Envoyer des messages groupés aux patients
+        </p>
+        <div class="flex gap-2">
+          <a routerLink="../campaigns"
+             class="px-3 py-1.5 text-sm text-primary border border-primary rounded-md
+                    hover:bg-primary-light transition-colors">
+            Voir tout
+          </a>
+          <a routerLink="../campaigns/new"
+             class="px-3 py-1.5 text-sm text-white bg-primary rounded-md
+                    hover:bg-primary-hover transition-colors">
+            + Nouvelle
+          </a>
+        </div>
+      </div>
+    </div>
+
+  }
+</div>

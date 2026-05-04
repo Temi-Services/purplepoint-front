@@ -1,0 +1,84 @@
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-semibold text-gray-900">
+      Bonjour, {{ user()?.firstName }} 👋
+    </h1>
+    <p class="text-sm text-muted mt-1">Voici votre tableau de bord santé</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center py-24">
+      <svg class="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+      </svg>
+    </div>
+  } @else {
+
+    <!-- KPI strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+      <div class="bg-surface rounded-lg border border-border p-4">
+        <p class="text-xs text-muted mb-1">Traitements actifs</p>
+        <p class="text-2xl font-semibold text-gray-900">{{ medications().length }}</p>
+      </div>
+      <div class="bg-surface rounded-lg border border-border p-4">
+        <p class="text-xs text-muted mb-1">Prochain RDV</p>
+        <p class="text-2xl font-semibold text-gray-900">
+          {{ upcomingAppointments().length > 0 ? upcomingAppointments()[0].type : '—' }}
+        </p>
+      </div>
+      <div class="col-span-2 sm:col-span-1 bg-surface rounded-lg border border-border p-4">
+        <p class="text-xs text-muted mb-2">Adhérence globale</p>
+        <pp-adherence-badge [score]="adherenceScore()" />
+      </div>
+    </div>
+
+    <!-- Médicaments du jour -->
+    <section class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-medium text-gray-900">Médicaments du jour</h2>
+        <a routerLink="../medications" class="text-sm text-primary hover:underline">
+          Voir tout
+        </a>
+      </div>
+
+      @if (todayMedications().length === 0) {
+        <div class="bg-surface rounded-lg border border-border px-6 py-10 text-center">
+          <p class="text-sm text-muted">Aucun traitement actif pour aujourd'hui.</p>
+        </div>
+      } @else {
+        <div class="grid gap-3 sm:grid-cols-2">
+          @for (med of todayMedications(); track med.id) {
+            <pp-medication-card [medication]="med" />
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Rendez-vous à venir -->
+    <section>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-medium text-gray-900">Rendez-vous à venir</h2>
+        <a routerLink="../appointments" class="text-sm text-primary hover:underline">
+          Voir tout
+        </a>
+      </div>
+
+      @if (upcomingAppointments().length === 0) {
+        <div class="bg-surface rounded-lg border border-border px-6 py-10 text-center">
+          <p class="text-sm text-muted">Aucun rendez-vous à venir.</p>
+        </div>
+      } @else {
+        <div class="grid gap-3">
+          @for (appt of upcomingAppointments(); track appt.id) {
+            <pp-appointment-card [appointment]="appt" />
+          }
+        </div>
+      }
+    </section>
+
+  }
+
+</div>

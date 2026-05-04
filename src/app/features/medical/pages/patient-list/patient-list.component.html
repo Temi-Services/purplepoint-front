@@ -1,0 +1,116 @@
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Patients</h1>
+      <p class="text-sm text-muted mt-1">{{ total() }} patients enregistrés</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-6">
+    <input
+      type="text"
+      [ngModel]="search()"
+      (ngModelChange)="search.set($event)"
+      placeholder="Rechercher par nom, email ou région…"
+      class="w-full sm:max-w-sm px-3 py-2 rounded-md border border-border bg-surface
+             text-sm focus:outline-none focus:ring-2 focus:ring-primary
+             focus:border-transparent placeholder:text-muted"
+    />
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center py-24">
+      <svg class="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+      </svg>
+    </div>
+  } @else {
+
+    <!-- Table -->
+    <div class="bg-surface rounded-lg border border-border overflow-hidden">
+      <table class="w-full text-sm">
+        <thead>
+        <tr class="border-b border-border bg-surface-2">
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">Patient</th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden sm:table-cell">Email</th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden md:table-cell">Région</th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">Statut</th>
+          <th class="px-4 py-3"></th>
+        </tr>
+        </thead>
+        <tbody>
+          @for (patient of filtered(); track patient.id) {
+            <tr class="border-b border-border last:border-0 hover:bg-surface-2 transition-colors">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center flex-shrink-0">
+                    <span class="text-xs font-medium text-primary">
+                      {{ patient.firstName[0] }}{{ patient.lastName[0] }}
+                    </span>
+                  </div>
+                  <span class="font-medium text-gray-900">
+                    {{ patient.firstName }} {{ patient.lastName }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-muted hidden sm:table-cell">{{ patient.email }}</td>
+              <td class="px-4 py-3 text-muted hidden md:table-cell">{{ patient.region ?? '—' }}</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                      [class]="patient.status === 'ACTIVE'
+                    ? 'bg-green-50 text-success'
+                    : 'bg-gray-100 text-muted'">
+                  {{ patient.status }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <a [routerLink]="['/medical/patients', patient.id]"
+                   class="text-xs font-medium text-primary hover:underline">
+                  Voir
+                </a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="px-4 py-12 text-center text-sm text-muted">
+                Aucun patient trouvé.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="flex items-center justify-between mt-4">
+        <p class="text-xs text-muted">
+          Page {{ page() }} sur {{ totalPages() }}
+        </p>
+        <div class="flex gap-2">
+          <button
+            (click)="goToPage(page() - 1)"
+            [disabled]="page() === 1"
+            class="px-3 py-1.5 text-xs rounded-md border border-border
+                   hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Précédent
+          </button>
+          <button
+            (click)="goToPage(page() + 1)"
+            [disabled]="page() === totalPages()"
+            class="px-3 py-1.5 text-xs rounded-md border border-border
+                   hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            Suivant
+          </button>
+        </div>
+      </div>
+    }
+
+  }
+</div>
