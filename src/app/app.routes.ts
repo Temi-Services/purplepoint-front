@@ -8,8 +8,8 @@ import { NotFoundComponent } from './shared/components/not-found/not-found.compo
 const loadLogin = () =>
   import('./features/auth/login/login.component').then(m => m.LoginComponent);
 
-//const loadUnauthorized = () =>
-//  import('./shared/components/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent);
+const loadUnauthorized = () =>
+  import('./shared/components/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent);
 
 const loadPatientRoutes = () =>
   import('./features/patient/patient.routes').then(m => m.PATIENT_ROUTES);
