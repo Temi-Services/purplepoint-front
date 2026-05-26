@@ -1,79 +1,117 @@
-<div class="max-w-5xl mx-auto px-4 py-8">
+<!-- Modales -->
+@if (showUserForm()) {
+  <pp-user-form-modal
+    (saved)="onUserSaved()"
+    (closed)="closeForm()"
+  />
+}
 
-  <div class="mb-8">
-    <h1 class="text-2xl font-semibold text-gray-900">Administration</h1>
-    <p class="text-sm text-muted mt-1">Gestion des utilisateurs et des campagnes</p>
+<!-- Templates colonnes DataTable -->
+<ng-template #nameCell let-user>
+  <div class="flex items-center gap-2.5">
+    <div class="w-7 h-7 rounded-full bg-primary-light flex items-center
+                justify-center flex-shrink-0">
+      <span class="text-xs font-semibold text-primary">
+        {{ user.firstName[0] }}{{ user.lastName[0] }}
+      </span>
+    </div>
+    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
+      {{ user.firstName }} {{ user.lastName }}
+    </span>
+  </div>
+</ng-template>
+
+<ng-template #roleCell   let-user><pp-badge [value]="user.role"   /></ng-template>
+<ng-template #statusCell let-user><pp-badge [value]="user.status" /></ng-template>
+
+<!-- Page -->
+<div class="flex flex-col gap-6">
+
+  <!-- WelcomeCard -->
+  <pp-welcome-card
+    [userName]="userName()"
+    subtitle="Gérez votre plateforme"
+    imageUrl="https://storyset.com/illustration/online-doctor/rafiki"
+    imageAlt="Tableau de bord administrateur"
+  />
+
+  <!-- StatCards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <pp-stat-card
+      label="Utilisateurs"
+      [value]="totalUsers()"
+      icon="ti-users"
+      color="primary"
+      [loading]="statsLoading()"
+      routerLink="/admin/users"
+    />
+    <pp-stat-card
+      label="Patients"
+      [value]="totalPatients()"
+      icon="ti-user-heart"
+      color="info"
+      [loading]="statsLoading()"
+    />
+    <pp-stat-card
+      label="Employés"
+      [value]="totalEmployees()"
+      icon="ti-user-check"
+      color="success"
+      [loading]="statsLoading()"
+    />
+    <pp-stat-card
+      label="Campagnes"
+      [value]="totalCampaigns()"
+      icon="ti-speakerphone"
+      color="warning"
+      [loading]="statsLoading()"
+      routerLink="/admin/campaigns"
+    />
   </div>
 
-  @if (isLoading()) {
-    <div class="flex justify-center py-24">
-      <svg class="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-      </svg>
-    </div>
-  } @else {
+  <!-- Grille principale -->
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-    <!-- KPIs -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-      <div class="bg-surface rounded-lg border border-border p-4">
-        <p class="text-xs text-muted mb-1">Utilisateurs</p>
-        <p class="text-2xl font-semibold text-gray-900">{{ totalUsers() }}</p>
+    <!-- Section principale : derniers utilisateurs (60%) -->
+    <div class="lg:col-span-3 flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+          Derniers utilisateurs
+        </h2>
+        <a routerLink="/admin/users"
+           class="text-sm text-primary hover:underline font-medium">
+          Voir tous →
+        </a>
       </div>
-      <div class="bg-surface rounded-lg border border-border p-4">
-        <p class="text-xs text-muted mb-1">Patients</p>
-        <p class="text-2xl font-semibold text-gray-900">{{ totalPatients() }}</p>
-      </div>
-      <div class="bg-surface rounded-lg border border-border p-4">
-        <p class="text-xs text-muted mb-1">Employés terrain</p>
-        <p class="text-2xl font-semibold text-gray-900">{{ totalEmployees() }}</p>
-      </div>
-      <div class="bg-surface rounded-lg border border-border p-4">
-        <p class="text-xs text-muted mb-1">Campagnes</p>
-        <p class="text-2xl font-semibold text-gray-900">{{ totalCampaigns() }}</p>
-      </div>
+
+      <pp-data-table
+        [columns]="columns()"
+        [data]="recentUsers()"
+        [total]="recentUsers().length"
+        [loading]="tableLoading()"
+        [showActions]="false"
+      />
     </div>
 
-    <!-- Actions rapides -->
-    <div class="grid sm:grid-cols-2 gap-4">
-      <div class="bg-surface rounded-lg border border-border p-6">
-        <h2 class="text-base font-medium text-gray-900 mb-1">Utilisateurs</h2>
-        <p class="text-sm text-muted mb-4">
-          Créer, modifier ou désactiver des comptes
-        </p>
-        <div class="flex gap-2">
-          <a routerLink="../users"
-             class="px-3 py-1.5 text-sm text-primary border border-primary rounded-md
-                    hover:bg-primary-light transition-colors">
-            Voir tout
-          </a>
-          <a routerLink="../users/new"
-             class="px-3 py-1.5 text-sm text-white bg-primary rounded-md
-                    hover:bg-primary-hover transition-colors">
-            + Créer
-          </a>
-        </div>
-      </div>
+    <!-- Accès rapides (40%) -->
+    <div class="lg:col-span-2 flex flex-col gap-3">
+      <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+        Accès rapides
+      </h2>
 
-      <div class="bg-surface rounded-lg border border-border p-6">
-        <h2 class="text-base font-medium text-gray-900 mb-1">Campagnes</h2>
-        <p class="text-sm text-muted mb-4">
-          Envoyer des messages groupés aux patients
-        </p>
-        <div class="flex gap-2">
-          <a routerLink="../campaigns"
-             class="px-3 py-1.5 text-sm text-primary border border-primary rounded-md
-                    hover:bg-primary-light transition-colors">
-            Voir tout
-          </a>
-          <a routerLink="../campaigns/new"
-             class="px-3 py-1.5 text-sm text-white bg-primary rounded-md
-                    hover:bg-primary-hover transition-colors">
-            + Nouvelle
-          </a>
-        </div>
+      <div class="card p-5 flex flex-col gap-3">
+        <button type="button" (click)="openCreate()" class="btn-primary w-full justify-center">
+          <i class="ti ti-user-plus" aria-hidden="true"></i>
+          Créer un utilisateur
+        </button>
+
+        <a routerLink="/admin/campaigns"
+           class="btn-ghost w-full justify-center border border-border rounded-lg">
+          <i class="ti ti-speakerphone" aria-hidden="true"></i>
+          Gérer les campagnes
+        </a>
       </div>
     </div>
 
-  }
+  </div>
 </div>

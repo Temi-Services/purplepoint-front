@@ -21,7 +21,6 @@ const STATUS_LABEL: Record<CampaignStatus, string> = {
 
 @Component({
   selector: 'pp-campaign-list',
-  standalone: true,
   imports: [RouterLink, DatePipe],
   templateUrl: './campaign-list.component.html',
 })
@@ -35,7 +34,6 @@ export class CampaignListComponent implements OnInit {
   readonly limit      = 20;
 
   readonly totalPages = computed(() => Math.ceil(this.total() / this.limit));
-
   readonly statusStyle = (s: CampaignStatus) => STATUS_STYLE[s] ?? 'bg-gray-100 text-muted';
   readonly statusLabel = (s: CampaignStatus) => STATUS_LABEL[s] ?? s;
 
@@ -54,19 +52,19 @@ export class CampaignListComponent implements OnInit {
     await this.loadCampaigns();
   }
 
-  // campaign-list.component.ts - loadCampaigns()
   private async loadCampaigns(): Promise<void> {
     this.isLoading.set(true);
     try {
+      // getAll() retourne PaginatedData<Campaign> directement (BaseApiService unwrap l'enveloppe)
+      // → res.data  = Campaign[]
+      // → res.total = number
       const res = await firstValueFrom(
-        this.campaignService.getAll(this.page(), this.limit)
+        this.campaignService.getAll({ page: this.page(), limit: this.limit })
       );
-      // res.data.data au lieu de res.data
-      this.campaigns.set(res?.data?.data ?? []);
-      this.total.set(res?.data?.total ?? 0);
+      this.campaigns.set(res?.data  ?? []);
+      this.total.set(res?.total ?? 0);
     } finally {
       this.isLoading.set(false);
     }
   }
-
 }

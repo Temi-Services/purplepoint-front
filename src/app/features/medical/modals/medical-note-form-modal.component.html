@@ -1,0 +1,43 @@
+<!-- src/app/features/medical/modals/medical-note-form-modal.component.html -->
+<pp-modal
+  title="Nouvelle note médicale"
+  size="md"
+  submitLabel="Enregistrer"
+  [loading]="isLoading()"
+  [submitDisabled]="form.invalid || !resolvedPatientId"
+  (closed)="closed.emit()"
+  (submitted)="onSubmit()"
+>
+  @if (error()) {
+    <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
+
+    <!-- Sélecteur patient : masqué si patientId déjà fourni en input -->
+    @if (!patientId()) {
+      <pp-patient-search
+        (patientSelected)="onPatientSelected($event)"
+        (patientCleared)="clearPatient()"
+      />
+    }
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Note médicale <span class="text-danger">*</span>
+      </label>
+      <textarea
+        formControlName="content"
+        rows="5"
+        placeholder="Observations, diagnostic, plan de traitement…"
+        class="input resize-none"
+      ></textarea>
+      @if (form.get('content')?.touched && form.get('content')?.hasError('minlength')) {
+        <p class="text-xs text-danger mt-1">Minimum 10 caractères.</p>
+      }
+    </div>
+
+  </form>
+</pp-modal>

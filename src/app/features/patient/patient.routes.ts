@@ -16,10 +16,15 @@ const loadMedicalRecord = () =>
   import('./pages/medical-record/medical-record-view.component')
     .then(m => m.MedicalRecordViewComponent);
 
+const loadNotes = () =>
+  import('./pages/notes/patient-notes.component')
+    .then(m => m.PatientNotesComponent);
+
 export const PATIENT_ROUTES: Routes = [
-  { path: '',         redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '',               redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard',      loadComponent: loadDashboard },
   { path: 'medications',    loadComponent: loadMedications },
   { path: 'appointments',   loadComponent: loadAppointments },
   { path: 'medical-record', loadComponent: loadMedicalRecord },
+  { path: 'notes',          loadComponent: loadNotes },
 ];

@@ -1,57 +1,98 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+// 📁 src/app/features/medical/services/medication.service.ts
+// ─────────────────────────────────────────────────────────────────────────────
+import { Injectable } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
-import { Medication } from '../../../core/models/medication.model';
 import { map } from 'rxjs/operators';
+import { BaseApiService } from '../../../core/http/base-api.service';
+import { ApiResponse, PaginatedData } from '../../../core/http/api-types';
+import {
+  Medication,
+  MedicationFrequency,
+  MedicationStatus,
+  IntakeStatus,
+} from '../../../core/models/medication.model';
 
-interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
+export interface PrescribeMedicationDto {
+  patientId:    string;           // UUID du patient
+  prescribedBy: string;           // UUID du médecin (auth.currentUser().id)
+  name:         string;
+  dosage:       string;
+  frequency:    'ONCE_DAILY' | 'TWICE_DAILY' | 'THREE_TIMES_DAILY' | 'WEEKLY' | 'AS_NEEDED';
+  startDate:    string;           // format date-time ISO
+  endDate?:     string;           // format date-time ISO (optionnel)
+  notes?:       string;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
+export interface LogIntakeDto {
+  status:      IntakeStatus;
+  scheduledAt: string;
+  takenAt?:    string;
+  note?:       string;
 }
 
-interface PrescribePayload {
-  patientId: string;
-  prescribedBy: string;
-  name: string;
-  dosage: string;
-  frequency: string;
-  startDate: string;
-  endDate?: string;
-  notes?: string;
+export interface ListMedicationsParams {
+  page?:   number;
+  limit?:  number;
+  status?: MedicationStatus;
+}
+
+export interface IntakeResult {
+  id:          string;
+  status:      string;
+  scheduledAt: string;
 }
 
 @Injectable({ providedIn: 'root' })
-export class MedicalMedicationService {
-  private readonly http    = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/medications`;
+export class MedicationService extends BaseApiService<Medication> {
+  protected readonly endpoint = '/medications';
 
+  // POST /medications
+  prescribe(dto: PrescribeMedicationDto): Observable<Medication> {
+    return super.create(dto);
+  }
+
+  // GET /medications/patient/:patientId?page=&limit=&status=
+  // Accepte soit un objet ListMedicationsParams, soit un status string direct
   getByPatient(
     patientId: string,
-    status = 'ACTIVE',
-    page = 1,
-    limit = 20,
-  ): Observable<PaginatedResponse<Medication>> {
-    const params = new HttpParams()
-      .set('status', status)
-      .set('page', page)
-      .set('limit', limit);
+    paramsOrStatus?: ListMedicationsParams | MedicationStatus,
+  ): Observable<PaginatedData<Medication>> {
+    let p = new HttpParams();
 
-    return this.http.get<ApiResponse<PaginatedResponse<Medication>>>(
-      `${this.baseUrl}/patient/${patientId}`,
-      { params },
-    ).pipe(map(response => response.data));
+    if (typeof paramsOrStatus === 'string') {
+      if (paramsOrStatus) p = p.set('status', paramsOrStatus);
+    } else if (paramsOrStatus) {
+      if (paramsOrStatus.page)   p = p.set('page',   String(paramsOrStatus.page));
+      if (paramsOrStatus.limit)  p = p.set('limit',  String(paramsOrStatus.limit));
+      if (paramsOrStatus.status) p = p.set('status', paramsOrStatus.status);
+    }
+
+    return this.http
+      .get<ApiResponse<PaginatedData<Medication>>>(
+        `${this.baseUrl}/patient/${patientId}`,
+        { params: p },
+      )
+      .pipe(map(res => res.data));
   }
 
-  prescribe(payload: PrescribePayload): Observable<Medication> {
-    return this.http.post<Medication>(this.baseUrl, payload);
+  // POST /medications/:id/intakes
+  logIntake(medicationId: string, dto: LogIntakeDto): Observable<IntakeResult> {
+    return this.http
+      .post<ApiResponse<IntakeResult>>(
+        `${this.baseUrl}/${medicationId}/intakes`,
+        dto,
+      )
+      .pipe(map(res => res.data));
+  }
+
+  // PATCH /medications/:id/discontinue
+  discontinue(id: string): Observable<Medication> {
+    return this.http
+      .patch<ApiResponse<Medication>>(`${this.baseUrl}/${id}/discontinue`, {})
+      .pipe(map(res => res.data));
   }
 }
+
+// Alias — anciens composants importaient MedicalMedicationService
+export { MedicationService as MedicalMedicationService };

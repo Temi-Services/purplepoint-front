@@ -1,35 +1,37 @@
+// 📁 src/app/features/patient/components/adherence-badge/adherence-badge.ts
+// ─────────────────────────────────────────────────────────────────────────────
 import { Component, input, computed } from '@angular/core';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'pp-adherence-badge',
-  standalone: true,
+  imports: [NgClass],
   template: `
-    <div class="flex items-center gap-2">
-      <div class="flex-1 h-2 bg-border rounded-full overflow-hidden">
-        <div
-          class="h-full rounded-full transition-all duration-500"
-          [class]="barColor()"
-          [style.width.%]="score()"
-        ></div>
-      </div>
-      <span class="text-sm font-medium" [class]="textColor()">
-        {{ score() }}%
-      </span>
-    </div>
+    <span
+      class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full"
+      [ngClass]="colorClass()"
+    >
+      <span class="w-1.5 h-1.5 rounded-full" [ngClass]="dotClass()"></span>
+      {{ label() }}
+    </span>
   `,
 })
 export class AdherenceBadgeComponent {
-  readonly score = input.required<number>();
+  readonly score = input<number>(0);
 
-  readonly barColor = computed(() => {
-    if (this.score() >= 80) return 'bg-success';
-    if (this.score() >= 50) return 'bg-warning';
-    return 'bg-danger';
+  readonly label = computed(() => `${this.score()}% d'adhérence`);
+
+  readonly colorClass = computed(() => {
+    const s = this.score();
+    if (s >= 80) return 'bg-green-50 text-success';
+    if (s >= 50) return 'bg-amber-50 text-warning';
+    return 'bg-red-50 text-danger';
   });
 
-  readonly textColor = computed(() => {
-    if (this.score() >= 80) return 'text-success';
-    if (this.score() >= 50) return 'text-warning';
-    return 'text-danger';
+  readonly dotClass = computed(() => {
+    const s = this.score();
+    if (s >= 80) return 'bg-success';
+    if (s >= 50) return 'bg-warning';
+    return 'bg-danger';
   });
 }

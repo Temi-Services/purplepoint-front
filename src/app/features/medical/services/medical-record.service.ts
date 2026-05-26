@@ -1,35 +1,52 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+// 📁 src/app/features/medical/services/medical-record.service.ts
+// ─────────────────────────────────────────────────────────────────────────────
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { BaseApiService } from '../../../core/http/base-api.service';
+import { ApiResponse } from '../../../core/http/api-types';
 import { MedicalRecord } from '../../../core/models/medical-record.model';
 
-interface AddNotePayload {
-  authorId: string;
-  content: string;
+export interface CreateMedicalRecordDto {
+  patientId:          string;
+  bloodType?:         string;
+  allergies?:         string[];
+  chronicConditions?: string[];
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
+export interface AddMedicalNoteDto {
+  authorId: string;
+  content:  string;
 }
 
 @Injectable({ providedIn: 'root' })
-export class MedicalRecordService {
-  private readonly http    = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/medical-records`;
+export class MedicalRecordService extends BaseApiService<MedicalRecord> {
+  protected readonly endpoint = '/medical-records';
 
-  getByPatient(patientId: string): Observable<MedicalRecord> {
-    return this.http.get<ApiResponse<MedicalRecord>>(
-      `${this.baseUrl}/patient/${patientId}`,
-    ).pipe(map(response => response.data));
+  // POST /medical-records
+  createRecord(dto: CreateMedicalRecordDto): Observable<MedicalRecord> {
+    return super.create(dto);
   }
 
-  addNote(patientId: string, payload: AddNotePayload): Observable<MedicalRecord> {
-    return this.http.post<MedicalRecord>(
-      `${this.baseUrl}/patient/${patientId}/notes`,
-      payload,
-    );
+  // GET /medical-records/patient/:patientId
+  getByPatientId(patientId: string): Observable<MedicalRecord> {
+    return this.http
+      .get<ApiResponse<MedicalRecord>>(`${this.baseUrl}/patient/${patientId}`)
+      .pipe(map(res => res.data));
+  }
+
+  // Alias — patient-detail, medical-record-view appellent getByPatient()
+  getByPatient(patientId: string): Observable<MedicalRecord> {
+    return this.getByPatientId(patientId);
+  }
+
+  // POST /medical-records/patient/:patientId/notes
+  addNote(patientId: string, dto: AddMedicalNoteDto): Observable<MedicalRecord> {
+    return this.http
+      .post<ApiResponse<MedicalRecord>>(
+        `${this.baseUrl}/patient/${patientId}/notes`,
+        dto,
+      )
+      .pipe(map(res => res.data));
   }
 }

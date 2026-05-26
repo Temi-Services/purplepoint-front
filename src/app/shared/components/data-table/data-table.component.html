@@ -1,0 +1,141 @@
+<div class="w-full">
+  <!-- Table wrapper avec scroll horizontal sur mobile -->
+  <div class="bg-surface rounded-xl border border-border overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm min-w-[520px]">
+
+        <!-- En-têtes -->
+        <thead>
+        <tr class="border-b border-border bg-surface-2">
+          @for (col of visibleColumns(); track col.key) {
+            <th
+              class="px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide"
+              [ngClass]="alignClass(col.align)"
+              [style.width]="col.width ?? 'auto'"
+            >
+              {{ col.label }}
+            </th>
+          }
+          @if (showActions()) {
+            <th class="px-4 py-3 w-20"></th>
+          }
+        </tr>
+        </thead>
+
+        <!-- Corps -->
+        <tbody>
+          @if (loading()) {
+            <!-- Skeleton : 5 lignes -->
+            @for (row of skeletonRows; track $index) {
+              <tr class="border-b border-border last:border-0">
+                @for (col of visibleColumns(); track col.key) {
+                  <td class="px-4 py-3">
+                    <div class="h-4 rounded-md bg-surface-2 animate-pulse"
+                         [style.width]="skeletonWidth($index)"></div>
+                  </td>
+                }
+                @if (showActions()) {
+                  <td class="px-4 py-3">
+                    <div class="h-4 w-12 rounded-md bg-surface-2 animate-pulse ml-auto"></div>
+                  </td>
+                }
+              </tr>
+            }
+          } @else if (data().length === 0) {
+            <tr>
+              <td [attr.colspan]="visibleColumns().length + (showActions() ? 1 : 0)">
+                <pp-empty-state
+                  title="Aucun résultat"
+                  description="Il n'y a rien à afficher pour le moment."
+                />
+              </td>
+            </tr>
+          } @else {
+            @for (item of data(); track trackBy()(item)) {
+              <tr
+                class="border-b border-border last:border-0 transition-colors"
+                [class.hover:bg-surface-2]="true"
+                [class.cursor-pointer]="hasRowClick()"
+                (click)="hasRowClick() && rowClick.emit(item)"
+              >
+                @for (col of visibleColumns(); track col.key) {
+                  <td class="px-4 py-3" [ngClass]="alignClass(col.align)">
+                    @if (col.template) {
+                      <ng-container
+                        [ngTemplateOutlet]="col.template"
+                        [ngTemplateOutletContext]="{ $implicit: item }"
+                      />
+                    } @else {
+                      <span class="text-gray-800 dark:text-gray-200">
+                            {{ getCellValue(item, col.key) }}
+                          </span>
+                    }
+                  </td>
+                }
+
+                @if (showActions()) {
+                  <td class="px-4 py-3">
+                    <div class="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        (click)="$event.stopPropagation(); edit.emit(item)"
+                        class="p-1.5 rounded-md text-muted hover:text-primary hover:bg-purple-50
+                                   dark:hover:bg-purple-900/20 transition-colors"
+                        aria-label="Modifier"
+                      >
+                        <i class="ti ti-edit text-base" aria-hidden="true"></i>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="$event.stopPropagation(); delete.emit(item)"
+                        class="p-1.5 rounded-md text-muted hover:text-danger hover:bg-red-50
+                                   dark:hover:bg-red-900/20 transition-colors"
+                        aria-label="Supprimer"
+                      >
+                        <i class="ti ti-trash text-base" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </td>
+                }
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  @if (!loading() && totalPages() > 1) {
+    <div class="flex items-center justify-between mt-3 px-1">
+      <p class="text-xs text-muted">
+        {{ paginationLabel() }}
+      </p>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="goTo(page() - 1)"
+          [disabled]="page() === 1"
+          class="px-3 py-1.5 text-xs rounded-lg border border-border hover:bg-surface-2
+                     disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          <i class="ti ti-chevron-left" aria-hidden="true"></i>
+        </button>
+
+        <span class="text-xs text-muted font-medium">
+              {{ page() }} / {{ totalPages() }}
+            </span>
+
+        <button
+          type="button"
+          (click)="goTo(page() + 1)"
+          [disabled]="page() === totalPages()"
+          class="px-3 py-1.5 text-xs rounded-lg border border-border hover:bg-surface-2
+                     disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          <i class="ti ti-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  }
+</div>

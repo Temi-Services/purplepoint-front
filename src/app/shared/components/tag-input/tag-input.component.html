@@ -1,0 +1,36 @@
+<!-- src/app/shared/components/tag-input/tag-input.component.html -->
+<div class="flex flex-wrap gap-2 p-2.5 min-h-[44px] rounded-lg border border-border bg-surface
+            focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-shadow">
+
+  @for (tag of tags(); track tag) {
+    <span
+      class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-sm font-medium"
+      [class]="color() === 'red'
+        ? 'bg-red-50 text-danger border border-red-100'
+        : 'bg-primary-light text-primary border border-purple-100'"
+    >
+      {{ tag }}
+      <button
+        type="button"
+        (click)="remove(tag)"
+        class="ml-0.5 rounded-full hover:opacity-70 transition-opacity leading-none"
+        [class]="color() === 'red' ? 'text-danger' : 'text-primary'"
+      >
+        <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm2.707-9.707a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </span>
+  }
+
+  <input
+    type="text"
+    [ngModel]="inputValue()"
+    (ngModelChange)="inputValue.set($event)"
+    (keydown)="onKeydown($event)"
+    (blur)="add()"
+    [placeholder]="tags().length === 0 ? placeholder() : ''"
+    class="flex-1 min-w-[120px] bg-transparent text-sm outline-none text-gray-900 dark:text-gray-100 placeholder:text-muted"
+  />
+</div>
+<p class="mt-1 text-xs text-muted">Appuyez sur Entrée ou virgule pour confirmer</p>

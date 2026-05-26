@@ -1,13 +1,14 @@
+// 📁 src/app/features/patient/pages/appointments/appointment-list.component.ts
+// ─────────────────────────────────────────────────────────────────────────────
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { MedicalAppointmentService } from '../../../medical/services/appointment.service';
+import { firstValueFrom } from 'rxjs';
+import { AppointmentService } from '../../services/appointment.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Appointment } from '../../../../core/models/appointment.model';
 import { AppointmentCardComponent } from '../../components/appointment-card/appointment-card.component';
-import { AppointmentService } from '../../services/appointment.service';
 
 @Component({
   selector: 'pp-appointment-list',
-  standalone: true,
   imports: [AppointmentCardComponent],
   templateUrl: './appointment-list.component.html',
 })
@@ -20,8 +21,8 @@ export class AppointmentListComponent implements OnInit {
   readonly activeTab    = signal<'upcoming' | 'past'>('upcoming');
 
   readonly tabs: { key: 'upcoming' | 'past'; label: string }[] = [
-    { key: 'upcoming', label: 'À venir'  },
-    { key: 'past',     label: 'Passés'   },
+    { key: 'upcoming', label: 'À venir' },
+    { key: 'past',     label: 'Passés'  },
   ];
 
   readonly filtered = computed(() => {
@@ -39,10 +40,10 @@ export class AppointmentListComponent implements OnInit {
 
     this.isLoading.set(true);
     try {
-      // @ts-ignore
-      const res = await this.apptService
-        .getByPatient(patientId)
-        .toPromise();
+      // getByPatient retourne PaginatedData<Appointment> → .data = Appointment[]
+      const res = await firstValueFrom(
+        this.apptService.getByPatient(patientId)
+      );
       this.appointments.set(res?.data ?? []);
     } finally {
       this.isLoading.set(false);

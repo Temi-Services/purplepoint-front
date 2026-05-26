@@ -1,0 +1,102 @@
+<!-- Modales -->
+@if (showAppt()) {
+  <pp-appointment-form-modal (saved)="onSaved()" (closed)="showAppt.set(false)" />
+}
+@if (showNote()) {
+  <pp-medical-note-form-modal (saved)="onSaved()" (closed)="showNote.set(false)" />
+}
+@if (showMed()) {
+  <pp-medication-form-modal (saved)="onSaved()" (closed)="showMed.set(false)" />
+}
+
+<!-- Templates colonnes -->
+<ng-template #nameCell let-user>
+  <div class="flex items-center gap-2.5">
+    <div class="w-7 h-7 rounded-full bg-primary-light flex items-center
+                justify-center flex-shrink-0">
+      <span class="text-xs font-semibold text-primary">
+        {{ user.firstName[0] }}{{ user.lastName[0] }}
+      </span>
+    </div>
+    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
+      {{ user.firstName }} {{ user.lastName }}
+    </span>
+  </div>
+</ng-template>
+
+<ng-template #statusCell let-user>
+  <pp-badge [value]="user.status" />
+</ng-template>
+
+<div class="flex flex-col gap-6">
+
+  <pp-welcome-card
+    [userName]="userName()"
+    subtitle="Suivez vos patients"
+    imageUrl="https://storyset.com/illustration/medicine/rafiki"
+    imageAlt="Tableau de bord médecin"
+  />
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <pp-stat-card
+      label="Patients suivis"
+      [value]="totalPatients()"
+      icon="ti-users"
+      color="primary"
+      [loading]="statsLoading()"
+      routerLink="/medical/patients"
+    />
+    <pp-stat-card
+      label="RDV du jour"
+      [value]="totalApptToday()"
+      icon="ti-calendar"
+      color="info"
+      [loading]="statsLoading()"
+    />
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+    <div class="lg:col-span-3 flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+          Patients récents
+        </h2>
+        <a routerLink="/medical/patients"
+           class="text-sm text-primary hover:underline font-medium">
+          Voir tous →
+        </a>
+      </div>
+      <pp-data-table
+        [columns]="columns()"
+        [data]="recentPatients()"
+        [total]="recentPatients().length"
+        [loading]="tableLoading()"
+        [showActions]="false"
+      />
+    </div>
+
+    <div class="lg:col-span-2 flex flex-col gap-3">
+      <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+        Accès rapides
+      </h2>
+      <div class="card p-4 flex flex-col gap-3">
+        <button type="button" (click)="showAppt.set(true)" class="btn-primary w-full justify-center">
+          <i class="ti ti-calendar-plus" aria-hidden="true"></i>
+          Nouveau RDV
+        </button>
+        <button type="button" (click)="showNote.set(true)"
+                class="btn-ghost w-full justify-center border border-border rounded-lg">
+          <i class="ti ti-notes" aria-hidden="true"></i>
+          Nouvelle note médicale
+        </button>
+        <button type="button" (click)="showMed.set(true)"
+                class="btn-ghost w-full justify-center border border-border rounded-lg">
+          <i class="ti ti-pill" aria-hidden="true"></i>
+          Nouvelle prescription
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

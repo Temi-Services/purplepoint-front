@@ -21,9 +21,9 @@ export class CampaignFormComponent {
   readonly error     = signal<string | null>(null);
 
   readonly targets: { value: CampaignTarget; label: string }[] = [
-    { value: 'ALL',    label: 'Tous les patients'     },
-    { value: 'REGION', label: 'Par région'            },
-    { value: 'ROLE',   label: 'Par rôle'              },
+    { value: 'ALL',    label: 'All patients'          },
+    { value: 'REGION', label: 'By region'             },
+    { value: 'ROLE',   label: 'By role'               },
   ];
 
   readonly form = this.fb.nonNullable.group({
@@ -55,7 +55,7 @@ export class CampaignFormComponent {
 
       this.router.navigate(['/admin/campaigns']);
     } catch {
-      this.error.set('Erreur lors de la création. Réessayez.');
+      this.error.set('Error during creation. Please try again.');
     } finally {
       this.isLoading.set(false);
     }

@@ -1,47 +1,56 @@
+// 📁 src/app/features/auth/login/login.component.ts
+// ─────────────────────────────────────────────────────────────────────────────
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../core/auth/auth.service';
-import { CommonModule } from '@angular/common';
+import { NewPasswordModalComponent } from '../new-password/new-password-modal.component';
 
 @Component({
   selector: 'pp-login',
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, NewPasswordModalComponent],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
   private readonly fb   = inject(FormBuilder);
-  private readonly auth = inject(AuthService);
+  readonly auth = inject(AuthService);
 
-  readonly isLoading = this.auth.isLoading;
-  readonly error     = signal<string | null>(null);
+  readonly isLoading        = this.auth.isLoading;
+  readonly challengePending = this.auth.challengePending;
+  readonly error            = signal<string | null>(null);
+  readonly showPassword     = signal(false);
+  readonly currentYear      = new Date().getFullYear();
 
   readonly form = this.fb.nonNullable.group({
-    email:    ['brennan1@gmail.com', [Validators.required, Validators.email]],
-    password: ['PurplePoint2026!', [Validators.required, Validators.minLength(8)]],
+    // Accepte email ou numéro de téléphone — pas de validation de format
+    identifier: ['', [Validators.required]],
+    password:   ['', [Validators.required, Validators.minLength(8)]],
   });
 
   async onSubmit(): Promise<void> {
-    if (this.form.invalid) return;
-    this.error.set(null);
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
-    const { email, password } = this.form.getRawValue();
+    this.error.set(null);
+    const { identifier, password } = this.form.getRawValue();
 
     try {
-      await this.auth.login(email, password);
+      await this.auth.login(identifier.trim(), password);
     } catch (err: unknown) {
       this.error.set(this.parseError(err));
     }
   }
 
   private parseError(err: unknown): string {
-    if (err instanceof Error) {
-      if (err.message.includes('Incorrect username or password'))
-        return 'Email ou mot de passe incorrect.';
-      if (err.message.includes('User is not confirmed'))
-        return 'Compte non vérifié. Vérifiez votre email.';
+    if (err instanceof HttpErrorResponse) {
+      const msg: string = err.error?.message ?? err.message ?? '';
+      return msg || 'Une erreur est survenue. Veuillez réessayer.';
     }
-    console.log(':: ERROR ::', err);
-    return 'Une erreur est survenue. Réessayez.';
+    if (err instanceof Error) {
+      return err.message || 'Une erreur est survenue. Veuillez réessayer.';
+    }
+    return 'Une erreur est survenue. Veuillez réessayer.';
   }
 }

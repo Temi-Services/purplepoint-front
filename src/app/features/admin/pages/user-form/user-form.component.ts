@@ -84,7 +84,7 @@ export class UserFormComponent implements OnInit {
 
       this.router.navigate(['/admin/users']);
     } catch {
-      this.error.set('Erreur lors de l\'enregistrement. Réessayez.');
+      this.error.set('Error while saving. Please try again.');
     } finally {
       this.isLoading.set(false);
     }

@@ -1,3 +1,4 @@
+// src/app/core/auth/auth.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from './auth.service';
@@ -8,15 +9,15 @@ export const authGuard: CanActivateFn = () => {
   const auth   = inject(AuthService);
   const router = inject(Router);
 
-  if (!auth.isLoading()) {
+  // Le service est déjà initialisé (constructor synchrone) — on peut décider immédiatement
+  if (auth.initialized()) {
     return auth.isAuthenticated() ? true : router.createUrlTree(['/login']);
   }
 
-  return toObservable(auth.isLoading).pipe(
-    filter(loading => !loading),
+  // Fallback : attendre l'initialisation (ne devrait pas arriver en pratique)
+  return toObservable(auth.initialized).pipe(
+    filter(initialized => initialized),
     take(1),
-    map(() =>
-      auth.isAuthenticated() ? true : router.createUrlTree(['/login'])
-    )
+    map(() => auth.isAuthenticated() ? true : router.createUrlTree(['/login'])),
   );
 };

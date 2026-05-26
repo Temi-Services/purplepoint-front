@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://api-purplepoint-dev.up.railway.app/api/v1',
+  apiUrl: 'http://localhost:3007/api/v1',
   cognito: {
     userPoolId: 'us-east-1_U3yCwN5yQ',
     clientId: '3nngurnl4v1m22l4l21r7oivph',
