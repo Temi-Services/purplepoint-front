@@ -1,4 +1,4 @@
-// src/environments/environment.prod.ts  (généré par scripts/set-env.ts au build)
+// src/environments/environment.prod.ts  (généré par scripts/set-env.js au build)
 export const environment = {
   production: true,
   apiUrl: 'VITE_API_URL_PLACEHOLDER',
