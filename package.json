@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "set-env": "ts-node -e \"require('./scripts/set-env.ts')\"",
+    "set-env": "node scripts/set-env.js",
     "build": "npm run set-env && ng build",
     "build:prod": "npm run set-env && ng build --configuration production",
     "start:prod": "node dist/purplepoint-front/server/server.mjs",

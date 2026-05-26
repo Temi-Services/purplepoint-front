@@ -1,19 +1,24 @@
-// scripts/set-env.ts
-// Exécuté avant ng build pour injecter les variables Railway dans environment.prod.ts
-import { writeFileSync } from 'fs';
-import { resolve } from 'path';
+// scripts/set-env.js
+const { writeFileSync } = require('fs');
+const { resolve }       = require('path');
 
 const apiUrl = process.env['API_URL'];
 
 if (!apiUrl) {
-  console.error('[set-env] ❌  La variable d\'environnement API_URL est manquante.');
+  console.error('[set-env] ❌  La variable API_URL est manquante.');
   process.exit(1);
 }
 
-const content = `// Généré automatiquement par scripts/set-env.ts — NE PAS ÉDITER
+const content = `// Généré automatiquement par scripts/set-env.js — NE PAS ÉDITER
 export const environment = {
   production: true,
-  apiUrl:     '${apiUrl}',
+  apiUrl: '${apiUrl}',
+  cognito: {
+    userPoolId: 'us-east-1_U3yCwN5yQ',
+    clientId:   '3nngurnl4v1m22l4l21r7oivph',
+    redirectUri:        'https://TON-DOMAINE.railway.app/login',
+    redirectSignOutUri: 'https://TON-DOMAINE.railway.app/login',
+  },
 } as const;
 `;
 
