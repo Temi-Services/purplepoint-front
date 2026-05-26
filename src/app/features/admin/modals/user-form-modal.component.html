@@ -1,0 +1,118 @@
+<pp-modal
+  [title]="isEdit() ? 'Modifier l\'utilisateur' : 'Créer un utilisateur'"
+  size="lg"
+  submitLabel="Enregistrer"
+  [loading]="isLoading()"
+  [submitDisabled]="form.invalid"
+  (closed)="closed.emit()"
+  (submitted)="onSubmit()"
+>
+  @if (fetchError()) {
+    <div class="px-4 py-3 rounded-lg bg-red-50 border border-red-200
+                text-sm text-red-700 mb-4">
+      {{ fetchError() }}
+    </div>
+  }
+
+  @if (isFetching()) {
+    <div class="flex flex-col gap-4 animate-pulse">
+      @for (i of [1,2,3,4]; track i) {
+        <div class="h-10 rounded-lg bg-surface-2"></div>
+      }
+    </div>
+  } @else {
+    <form [formGroup]="form" class="grid grid-cols-1 sm:grid-cols-2 gap-4"
+          (ngSubmit)="onSubmit()">
+
+      <!-- Prénom -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Prénom <span class="text-danger">*</span>
+        </label>
+        <input type="text" formControlName="firstName" placeholder="Jean" class="input" />
+        @if (touched('firstName') && invalid('firstName', 'required')) {
+          <p class="text-xs text-danger mt-1">Champ requis.</p>
+        }
+      </div>
+
+      <!-- Nom -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Nom <span class="text-danger">*</span>
+        </label>
+        <input type="text" formControlName="lastName" placeholder="Dupont" class="input" />
+        @if (touched('lastName') && invalid('lastName', 'required')) {
+          <p class="text-xs text-danger mt-1">Champ requis.</p>
+        }
+      </div>
+
+      <!-- Email -->
+      <div class="sm:col-span-2">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Adresse e-mail <span class="text-danger">*</span>
+        </label>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="jean.dupont@exemple.com"
+          class="input"
+          [class.opacity-60]="isEdit()"
+          [class.cursor-not-allowed]="isEdit()"
+        />
+        @if (touched('email') && invalid('email', 'email')) {
+          <p class="text-xs text-danger mt-1">Adresse e-mail invalide.</p>
+        }
+      </div>
+
+      <!-- Téléphone -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Téléphone
+        </label>
+        <input type="tel" formControlName="phone" placeholder="+33 6 00 00 00 00" class="input" />
+      </div>
+
+      <!-- Région -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Région
+        </label>
+        <input type="text" formControlName="region" placeholder="Île-de-France" class="input" />
+      </div>
+
+      <!-- Rôle -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Rôle <span class="text-danger">*</span>
+        </label>
+        <select formControlName="role" class="input">
+          @for (role of roles; track role) {
+            <option [value]="role">{{ roleLabel(role) }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Statut (édition uniquement) -->
+      @if (isEdit()) {
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            Statut
+          </label>
+          <select formControlName="status" class="input">
+            <option value="ACTIVE">Actif</option>
+            <option value="INACTIVE">Inactif</option>
+            <option value="SUSPENDED">Suspendu</option>
+          </select>
+        </div>
+      }
+
+      @if (saveError()) {
+        <div class="sm:col-span-2 px-4 py-3 rounded-lg bg-red-50 border border-red-200
+                    text-sm text-red-700">
+          {{ saveError() }}
+        </div>
+      }
+
+    </form>
+  }
+</pp-modal>

@@ -2,13 +2,13 @@
 
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-semibold text-gray-900">Campagnes</h1>
-      <p class="text-sm text-muted mt-1">{{ total() }} campagnes créées</p>
+      <h1 class="text-2xl font-semibold text-gray-900">Campaigns</h1>
+      <p class="text-sm text-muted mt-1">{{ total() }} campaigns created</p>
     </div>
     <a routerLink="../campaigns/new"
        class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md
               hover:bg-primary-hover transition-colors">
-      + Nouvelle campagne
+      + New campaign
     </a>
   </div>
 
@@ -35,16 +35,16 @@
               </div>
               <p class="text-sm text-muted line-clamp-2">{{ campaign.message }}</p>
               <div class="flex items-center gap-4 mt-2 text-xs text-muted">
-                <span>Cible : {{ campaign.target }}</span>
+                <span>Target: {{ campaign.target }}</span>
                 @if (campaign.region) {
-                  <span>Région : {{ campaign.region }}</span>
+                  <span>Region: {{ campaign.region }}</span>
                 }
                 @if (campaign.recipientCount !== undefined) {
-                  <span>{{ campaign.recipientCount }} destinataires</span>
+                  <span>{{ campaign.recipientCount }} recipients</span>
                 }
                 @if (campaign.scheduledAt) {
                   <span>
-                    Planifiée : {{ campaign.scheduledAt | date:'d MMM yyyy' : '' : 'fr' }}
+                    Scheduled: {{ campaign.scheduledAt | date:'d MMM yyyy' }}
                   </span>
                 }
               </div>
@@ -54,31 +54,31 @@
                 (click)="delete(campaign.id)"
                 class="flex-shrink-0 text-xs text-danger hover:underline"
               >
-                Supprimer
+                Delete
               </button>
             }
           </div>
         </div>
       } @empty {
         <div class="bg-surface rounded-lg border border-border px-6 py-12 text-center">
-          <p class="text-sm text-muted">Aucune campagne créée.</p>
+          <p class="text-sm text-muted">No campaigns created.</p>
         </div>
       }
     </div>
 
     @if (totalPages() > 1) {
       <div class="flex items-center justify-between mt-4">
-        <p class="text-xs text-muted">Page {{ page() }} sur {{ totalPages() }}</p>
+        <p class="text-xs text-muted">Page {{ page() }} of {{ totalPages() }}</p>
         <div class="flex gap-2">
           <button (click)="goToPage(page() - 1)" [disabled]="page() === 1"
                   class="px-3 py-1.5 text-xs rounded-md border border-border
                    hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed">
-            Précédent
+            Previous
           </button>
           <button (click)="goToPage(page() + 1)" [disabled]="page() === totalPages()"
                   class="px-3 py-1.5 text-xs rounded-md border border-border
                    hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed">
-            Suivant
+            Next
           </button>
         </div>
       </div>

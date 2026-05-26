@@ -1,0 +1,61 @@
+<!-- src/app/features/medical/modals/appointment-form-modal.component.html -->
+<pp-modal
+  title="Nouveau rendez-vous"
+  size="md"
+  submitLabel="Créer"
+  [loading]="isLoading()"
+  [submitDisabled]="form.invalid"
+  (closed)="closed.emit()"
+  (submitted)="onSubmit()"
+>
+  @if (error()) {
+    <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
+
+    @if (!patientId()) {
+      <pp-patient-search
+        (patientSelected)="onPatientSelected($event)"
+        (patientCleared)="form.patchValue({ patientId: '' })"
+      />
+    }
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Type <span class="text-danger">*</span>
+        </label>
+        <select formControlName="type" class="input">
+          @for (t of types; track t) {
+            <option [value]="t">{{ t | ppLabel:'appointmentType' }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Durée (min) <span class="text-danger">*</span>
+        </label>
+        <input type="number" formControlName="duration" min="5" class="input" />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Date et heure <span class="text-danger">*</span>
+      </label>
+      <input type="datetime-local" formControlName="scheduledAt" class="input" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Lieu
+      </label>
+      <input type="text" formControlName="location"
+             placeholder="Cabinet, domicile…" class="input" />
+    </div>
+
+  </form>
+</pp-modal>

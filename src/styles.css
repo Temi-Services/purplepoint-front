@@ -2,35 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Variables CSS pour les tokens sémantiques (version light par défaut) */
+/* ─── Tokens sémantiques — Light (défaut) ─────────────────────────────────── */
 :root {
-  --color-primary: #534AB7;         /* purple-600 */
+  --color-primary:       #534AB7;   /* purple-600 */
   --color-primary-hover: #3C3489;   /* purple-800 */
-  --color-primary-light: #EEEDFE;   /* purple-50 */
-  --color-primary-text: #26215C;    /* purple-900 */
+  --color-primary-light: #EEEDFE;   /* purple-50  */
+  --color-primary-text:  #26215C;   /* purple-900 */
 
-  --color-surface: #FFFFFF;
+  --color-surface:   #FFFFFF;
   --color-surface-2: #F8F8FB;
-  --color-border: #E5E4F0;
-  --color-muted: #7C7A8E;
+  --color-border:    #E5E4F0;
+  --color-muted:     #7C7A8E;
 }
 
-/* Override pour le dark mode (si préférence système : dark) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-surface: #13121F;
-    --color-surface-2: #1C1B2E;
-    --color-border: #2E2C45;
-    --color-muted: #9E9CB8;
-  }
+/* ─── Tokens sémantiques — Dark ───────────────────────────────────────────── */
+/* Activé par ThemeService via la classe 'dark' sur <html>                     */
+/* (plus de @media prefers-color-scheme — contrôle manuel uniquement)          */
+html.dark {
+  --color-surface:   #13121F;
+  --color-surface-2: #1C1B2E;
+  --color-border:    #2E2C45;
+  --color-muted:     #9E9CB8;
 }
 
-/* Optionnel : tu peux aussi définir des classes utilitaires personnalisées si besoin */
+/* ─── Reset & base ────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-surface-2);
+  color: theme('colors.gray.900');
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+html.dark body {
+  color: theme('colors.gray.100');
+}
+
+/* ─── Classes utilitaires personnalisées ──────────────────────────────────── */
 @layer components {
+
+  /* Bouton primary */
   .btn-primary {
-    @apply bg-primary text-white rounded-md px-4 py-2 transition-colors;
+    @apply inline-flex items-center gap-2 px-4 py-2 text-sm font-medium
+    bg-primary text-white rounded-lg transition-colors
+    disabled:opacity-50 disabled:cursor-not-allowed;
   }
-  .btn-primary:hover {
+  .btn-primary:hover:not(:disabled) {
     background-color: var(--color-primary-hover);
+  }
+
+  /* Bouton ghost (icônes, actions secondaires) */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-2 text-sm font-medium
+    text-muted rounded-lg hover:bg-surface-2 hover:text-gray-900
+    transition-colors;
+  }
+
+  html.dark .btn-ghost:hover {
+    color: theme('colors.gray.100');
+  }
+
+  /* Bouton danger */
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-4 py-2 text-sm font-medium
+    bg-danger text-white rounded-lg transition-colors
+    disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-danger:hover:not(:disabled) {
+    @apply bg-red-700;
+  }
+
+  /* Input standard */
+  .input {
+    @apply w-full px-3 py-2 rounded-lg border border-border bg-surface
+    text-sm text-gray-900 placeholder:text-muted
+    focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+    transition-shadow;
+  }
+
+  html.dark .input {
+    color: theme('colors.gray.100');
+  }
+
+  /* Card standard */
+  .card {
+    @apply bg-surface rounded-xl border border-border;
   }
 }

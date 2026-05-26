@@ -1,0 +1,75 @@
+<!-- src/app/shared/components/patient-search/patient-search.component.html -->
+<div class="relative">
+  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+    Patient <span class="text-danger">*</span>
+  </label>
+
+  <div class="relative">
+    <input
+      type="text"
+      [value]="displayValue()"
+      (input)="onInput($event)"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      [placeholder]="placeholder()"
+      autocomplete="off"
+      class="input pr-9"
+    />
+
+    @if (isSearching()) {
+      <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+        <svg class="animate-spin h-4 w-4 text-muted" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+        </svg>
+      </div>
+    }
+
+    @if (selectedPatient() && !isSearching()) {
+      <button
+        type="button"
+        (click)="clear()"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+        title="Effacer"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm2.707-9.707a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    }
+  </div>
+
+  @if (showDropdown() && (results().length > 0 || (query().length >= 2 && !isSearching()))) {
+    <div class="absolute z-50 w-full mt-1 bg-surface border border-border rounded-lg shadow-lg overflow-hidden">
+
+      @if (results().length > 0) {
+        @for (patient of results(); track patient.id) {
+          <button
+            type="button"
+            (mousedown)="selectPatient(patient)"
+            class="w-full text-left px-3 py-2.5 text-sm hover:bg-surface-2 transition-colors
+                   border-b border-border last:border-0 flex items-center justify-between gap-2"
+          >
+            <span>
+              <span class="font-medium text-gray-900 dark:text-gray-100">
+                {{ patient.firstName }} {{ patient.lastName }}
+              </span>
+              @if (patient.region) {
+                <span class="text-muted ml-2 text-xs">{{ patient.region }}</span>
+              }
+            </span>
+            <span class="text-muted text-xs shrink-0">{{ patient.email }}</span>
+          </button>
+        }
+      } @else {
+        <div class="px-3 py-4 text-sm text-center text-muted">
+          Aucun patient trouvé pour « {{ query() }} »
+        </div>
+      }
+    </div>
+  }
+
+  @if (touched() && !selectedPatient()) {
+    <p class="mt-1 text-xs text-danger">Veuillez sélectionner un patient.</p>
+  }
+</div>

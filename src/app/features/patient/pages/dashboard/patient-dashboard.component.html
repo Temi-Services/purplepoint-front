@@ -1,84 +1,136 @@
-<div class="max-w-5xl mx-auto px-4 py-8">
+<div class="flex flex-col gap-6">
 
-  <!-- Header -->
-  <div class="mb-8">
-    <h1 class="text-2xl font-semibold text-gray-900">
-      Bonjour, {{ user()?.firstName }} 👋
-    </h1>
-    <p class="text-sm text-muted mt-1">Voici votre tableau de bord santé</p>
+  <!-- WelcomeCard -->
+  <pp-welcome-card
+    [userName]="userName()"
+    [subtitle]="subtitle()"
+    imageUrl="illustrations/patient-dashboard.svg"
+    imageAlt="Tableau de bord patient"
+  />
+
+  <!-- StatCards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <pp-stat-card
+      label="Médicaments actifs"
+      [value]="activeMedsCount()"
+      icon="ti-pill"
+      color="primary"
+      [loading]="statsLoading()"
+      routerLink="/patient/medications"
+    />
+    <pp-stat-card
+      label="Prochain RDV"
+      [value]="nextAppointment() ? (nextAppointment()!.scheduledAt | date:'dd/MM') ?? '—' : '—'"
+      icon="ti-calendar"
+      color="info"
+      [loading]="statsLoading()"
+      routerLink="/patient/appointments"
+    />
+    <pp-stat-card
+      label="Notes cette semaine"
+      [value]="notesThisWeek()"
+      icon="ti-notes"
+      color="success"
+      [loading]="statsLoading()"
+      routerLink="/patient/notes"
+    />
   </div>
 
-  @if (isLoading()) {
-    <div class="flex justify-center py-24">
-      <svg class="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-      </svg>
-    </div>
-  } @else {
+  <!-- Grille principale -->
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-    <!-- KPI strip -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-      <div class="bg-surface rounded-lg border border-border p-4">
-        <p class="text-xs text-muted mb-1">Traitements actifs</p>
-        <p class="text-2xl font-semibold text-gray-900">{{ medications().length }}</p>
-      </div>
-      <div class="bg-surface rounded-lg border border-border p-4">
-        <p class="text-xs text-muted mb-1">Prochain RDV</p>
-        <p class="text-2xl font-semibold text-gray-900">
-          {{ upcomingAppointments().length > 0 ? upcomingAppointments()[0].type : '—' }}
-        </p>
-      </div>
-      <div class="col-span-2 sm:col-span-1 bg-surface rounded-lg border border-border p-4">
-        <p class="text-xs text-muted mb-2">Adhérence globale</p>
-        <pp-adherence-badge [score]="adherenceScore()" />
-      </div>
-    </div>
-
-    <!-- Médicaments du jour -->
-    <section class="mb-8">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base font-medium text-gray-900">Médicaments du jour</h2>
-        <a routerLink="../medications" class="text-sm text-primary hover:underline">
-          Voir tout
+    <!-- Médicaments du jour (60%) -->
+    <div class="lg:col-span-3 flex flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+          Médicaments du jour
+        </h2>
+        <a routerLink="/patient/medications"
+           class="text-sm text-primary hover:underline font-medium">
+          Voir tous →
         </a>
       </div>
 
-      @if (todayMedications().length === 0) {
-        <div class="bg-surface rounded-lg border border-border px-6 py-10 text-center">
-          <p class="text-sm text-muted">Aucun traitement actif pour aujourd'hui.</p>
+      @if (medsRes.isLoading()) {
+        <div class="flex flex-col gap-3">
+          @for (i of [1,2,3]; track i) {
+            <div class="card p-4 animate-pulse h-16 bg-surface-2 rounded-xl"></div>
+          }
+        </div>
+      } @else if (medications().length === 0) {
+        <div class="card p-8 text-center text-sm text-muted">
+          Aucun médicament actif.
         </div>
       } @else {
-        <div class="grid gap-3 sm:grid-cols-2">
-          @for (med of todayMedications(); track med.id) {
-            <pp-medication-card [medication]="med" />
+        <div class="flex flex-col gap-3">
+          @for (med of medications(); track med.id) {
+            <div class="card p-4 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-primary-light flex items-center
+                            justify-center flex-shrink-0">
+                  <i class="ti ti-pill text-lg text-primary" aria-hidden="true"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {{ med.name }}
+                  </p>
+                  <p class="text-xs text-muted">{{ med.dosage }} · {{ med.frequency | ppLabel:'frequency' }}</p>
+                </div>
+              </div>
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-success">
+                Actif
+              </span>
+            </div>
           }
         </div>
       }
-    </section>
+    </div>
 
-    <!-- Rendez-vous à venir -->
-    <section>
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base font-medium text-gray-900">Rendez-vous à venir</h2>
-        <a routerLink="../appointments" class="text-sm text-primary hover:underline">
-          Voir tout
-        </a>
+    <!-- Accès rapides (40%) -->
+    <div class="lg:col-span-2 flex flex-col gap-4">
+      <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
+        Accès rapides
+      </h2>
+
+      <!-- Prochain rendez-vous -->
+      @if (nextAppointment()) {
+        <div class="card p-4">
+          <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">
+            Prochain rendez-vous
+          </p>
+          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {{ nextAppointment()!.scheduledAt | date:'EEEE dd MMMM':'':'fr' }}
+          </p>
+          <p class="text-xs text-muted mt-0.5">
+            {{ nextAppointment()!.type | ppLabel:'appointmentType' }} · {{ nextAppointment()!.duration }} min
+          </p>
+        </div>
+      }
+
+      <!-- Illustration + actions -->
+      <div class="card p-4 flex flex-col items-center gap-4">
+        <!-- Illustration equilibrage espace -->
+        <img
+          src="illustrations/patient-quick-actions.svg"
+          alt="Actions rapides"
+          class="w-32 h-32 object-contain opacity-90"
+          loading="lazy"
+        />
+
+        <!-- Boutons -->
+        <div class="flex flex-col gap-3 w-full">
+          <a routerLink="/patient/notes" class="btn-primary w-full justify-center">
+            <i class="ti ti-notes" aria-hidden="true"></i>
+            Mes notes
+          </a>
+          <a routerLink="/patient/medical-record"
+             class="btn-ghost w-full justify-center border border-border rounded-lg">
+            <i class="ti ti-report-medical" aria-hidden="true"></i>
+            Mon dossier
+          </a>
+        </div>
       </div>
+    </div>
 
-      @if (upcomingAppointments().length === 0) {
-        <div class="bg-surface rounded-lg border border-border px-6 py-10 text-center">
-          <p class="text-sm text-muted">Aucun rendez-vous à venir.</p>
-        </div>
-      } @else {
-        <div class="grid gap-3">
-          @for (appt of upcomingAppointments(); track appt.id) {
-            <pp-appointment-card [appointment]="appt" />
-          }
-        </div>
-      }
-    </section>
-
-  }
-
+  </div>
 </div>

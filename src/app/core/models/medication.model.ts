@@ -1,3 +1,8 @@
+// 📁 src/app/core/models/medication.model.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// Aligné sur MedicationResponseDto backend
+
+// ⚠️  Backend utilise "Frequency" (pas "MedicationFrequency") et "DISCONTINUED" (pas "SUSPENDED")
 export type MedicationFrequency =
   | 'ONCE_DAILY'
   | 'TWICE_DAILY'
@@ -5,28 +10,33 @@ export type MedicationFrequency =
   | 'WEEKLY'
   | 'AS_NEEDED';
 
-export type MedicationStatus = 'ACTIVE' | 'COMPLETED' | 'SUSPENDED';
+export type MedicationStatus =
+  | 'ACTIVE'
+  | 'DISCONTINUED'   // ⚠️ backend : DISCONTINUED (pas SUSPENDED)
+  | 'COMPLETED';
 
 export type IntakeStatus = 'TAKEN' | 'MISSED' | 'SKIPPED';
 
-export interface Medication {
-  id: string;
-  patientId: string;
-  prescribedBy: string;
-  name: string;
-  dosage: string;
-  frequency: MedicationFrequency;
-  startDate: string;
-  endDate?: string;
-  status: MedicationStatus;
-  notes?: string;
+export interface MedicationIntake {
+  id:          string;
+  status:      IntakeStatus;
+  scheduledAt: string | Date;
+  takenAt:     string | Date | null;
+  note:        string | null;
 }
 
-export interface MedicationIntake {
-  id: string;
-  medicationId: string;
-  status: IntakeStatus;
-  scheduledAt: string;
-  takenAt?: string;
-  note?: string;
+export interface Medication {
+  id:            string;
+  patientId:     string;
+  prescribedBy:  string;
+  name:          string;
+  dosage:        string;
+  frequency:     MedicationFrequency;
+  status:        MedicationStatus;
+  startDate:     string | Date;
+  endDate:       string | Date | null;
+  notes:         string | null;
+  adherenceRate: number | null;
+  intakes:       MedicationIntake[];
+  createdAt:     string | Date;
 }

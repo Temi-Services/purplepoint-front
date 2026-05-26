@@ -1,66 +1,74 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
-import { Appointment } from '../../../core/models/appointment.model';
-import { map } from 'rxjs/operators';
+// 📁 src/app/features/medical/services/appointment.service.ts
+// ─────────────────────────────────────────────────────────────────────────────
+import { Injectable } from '@angular/core';
+import { Observable, map } from 'rxjs';
+import { BaseApiService } from '../../../core/http/base-api.service';
+import { ApiResponse, PaginatedData } from '../../../core/http/api-types';
+import { Appointment, AppointmentStatus, AppointmentType } from '../../../core/models/appointment.model';
 
-interface PaginatedResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
+export interface CreateAppointmentDto {
+  patientId:   string;            // UUID du patient
+  providerId:  string;            // UUID du médecin (auth.currentUser().id)
+  type:        'CONSULTATION' | 'FOLLOW_UP' | 'EMERGENCY' | 'HOME_VISIT';
+  scheduledAt: string;            // format date-time ISO
+  duration:    number;            // en minutes
+  location?:   string;
+  notes?:      string;
 }
 
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-}
-
-interface CreateAppointmentPayload {
-  patientId: string;
-  providerId: string;
-  type: string;
-  scheduledAt: string;
-  duration: number;
-  location?: string;
-  notes?: string;
+export interface ListAppointmentsParams {
+  page?:       number;
+  limit?:      number;
+  patientId?:  string;
+  providerId?: string;
+  status?:     AppointmentStatus;
+  from?:       string;
+  to?:         string;
 }
 
 @Injectable({ providedIn: 'root' })
-export class MedicalAppointmentService {
-  private readonly http    = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/appointments`;
+export class AppointmentService extends BaseApiService<Appointment> {
+  protected readonly endpoint = '/appointments';
 
-  // medical/services/appointment.service.ts
-  getByPatient(
-    patientId: string,
-    page = 1,
-    limit = 20,
-  ): Observable<PaginatedResponse<Appointment>> {  // ← retourne directement PaginatedData
-    let params = new HttpParams()
-      .set('patientId', patientId)
-      .set('page', page)
-      .set('limit', limit);
-
-    // On pipe pour extraire data du wrapper API
-    return this.http.get<ApiResponse<PaginatedResponse<Appointment>>>(this.baseUrl, { params })
-      .pipe(map(response => response.data));
+  // GET /appointments?page=&limit=&patientId=&providerId=&status=&from=&to=
+  override getAll(params: ListAppointmentsParams = {}): Observable<PaginatedData<Appointment>> {
+    return super.getAll(params);
   }
 
-  create(payload: CreateAppointmentPayload): Observable<Appointment> {
-    return this.http.post<Appointment>(this.baseUrl, payload);
+  // GET /appointments/:id
+  override getById(id: string): Observable<Appointment> {
+    return super.getById(id);
   }
 
+  // POST /appointments
+  createAppointment(dto: CreateAppointmentDto): Observable<Appointment> {
+    return super.create(dto);
+  }
+
+  // Shortcut : GET /appointments?patientId=:id (retourne PaginatedData)
+  getByPatientId(patientId: string, params: Omit<ListAppointmentsParams, 'patientId'> = {}): Observable<PaginatedData<Appointment>> {
+    return this.getAll({ ...params, patientId });
+  }
+
+  // Alias pour patient-detail qui appelle getByPatient(id)
+  getByPatient(patientId: string): Observable<PaginatedData<Appointment>> {
+    return this.getByPatientId(patientId);
+  }
+
+  // PATCH /appointments/:id/confirm
   confirm(id: string): Observable<Appointment> {
-    return this.http.patch<Appointment>(`${this.baseUrl}/${id}/confirm`, {});
+    return this.http
+      .patch<ApiResponse<Appointment>>(`${this.baseUrl}/${id}/confirm`, {})
+      .pipe(map(res => res.data));
   }
 
-  cancel(id: string, reason: string): Observable<Appointment> {
-    return this.http.patch<Appointment>(
-      `${this.baseUrl}/${id}/cancel`,
-      { reason },
-    );
+  // PATCH /appointments/:id/cancel  body: { reason }
+  cancelAppointment(id: string, reason: string): Observable<Appointment> {
+    return this.http
+      .patch<ApiResponse<Appointment>>(`${this.baseUrl}/${id}/cancel`, { reason })
+      .pipe(map(res => res.data));
   }
 }
+
+// Alias — anciens composants importaient MedicalAppointmentService
+export { AppointmentService as MedicalAppointmentService };

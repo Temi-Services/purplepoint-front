@@ -1,3 +1,26 @@
+<!-- ── Modales ──────────────────────────────────────────────────────────────── -->
+@if (showApptModal()) {
+  <pp-appointment-form-modal
+    [patientId]="id()"
+    (saved)="onModalSaved()"
+    (closed)="showApptModal.set(false)"
+  />
+}
+@if (showMedModal()) {
+  <pp-medication-form-modal
+    [patientId]="id()"
+    (saved)="onModalSaved()"
+    (closed)="showMedModal.set(false)"
+  />
+}
+@if (showNoteModal()) {
+  <pp-medical-note-form-modal
+    [patientId]="id()"
+    (saved)="onModalSaved()"
+    (closed)="showNoteModal.set(false)"
+  />
+}
+
 <div class="max-w-5xl mx-auto px-4 py-8">
 
   <!-- Back -->
@@ -24,11 +47,11 @@
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center flex-shrink-0">
             <span class="text-base font-semibold text-primary">
-              {{ patient()?.firstName?.[0] }} {{ patient()?.lastName?.[0] }}
+              {{ patient()?.firstName?.[0] }}{{ patient()?.lastName?.[0] }}
             </span>
           </div>
           <div>
-            <h1 class="text-xl font-semibold text-gray-900">
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
               {{ patient()?.firstName }} {{ patient()?.lastName }}
             </h1>
             <p class="text-sm text-muted mt-0.5">{{ patient()?.email }}</p>
@@ -37,11 +60,9 @@
             }
           </div>
         </div>
-        <div class="flex items-center gap-3 flex-shrink-0">
-          <div class="w-32">
-            <p class="text-xs text-muted mb-1">Adhérence</p>
-            <pp-adherence-badge [score]="adherenceScore()" />
-          </div>
+        <div class="flex-shrink-0">
+          <p class="text-xs text-muted mb-1">Adhérence</p>
+          <pp-adherence-badge [score]="adherenceScore()" />
         </div>
       </div>
     </div>
@@ -63,14 +84,16 @@
       </nav>
     </div>
 
-    <!-- Tab: Dossier médical -->
+    <!-- ── Dossier médical ──────────────────────────────────────────────────── -->
     @if (activeTab() === 'record') {
       <div class="bg-surface rounded-lg border border-border p-6">
         @if (record()) {
           <div class="grid sm:grid-cols-2 gap-6">
             <div>
               <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">Groupe sanguin</p>
-              <p class="text-sm text-gray-900">{{ record()?.bloodType ?? '—' }}</p>
+              <p class="text-sm text-gray-900 dark:text-gray-100">
+                {{ record()?.bloodType | ppLabel:'bloodType' }}
+              </p>
             </div>
             <div>
               <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">Allergies</p>
@@ -107,24 +130,31 @@
       </div>
     }
 
-    <!-- Tab: Traitements -->
+    <!-- ── Traitements ─────────────────────────────────────────────────────── -->
     @if (activeTab() === 'medications') {
       <div class="flex justify-end mb-4">
-        <a [routerLink]="['./medications/new']"
-           class="text-sm font-medium px-4 py-2 rounded-md bg-primary text-white hover:bg-primary-hover transition-colors">
-          + Prescrire
-        </a>
+        <button type="button" (click)="showMedModal.set(true)"
+                class="btn-primary text-sm">
+          <i class="ti ti-plus" aria-hidden="true"></i>
+          Prescrire
+        </button>
       </div>
       <div class="grid gap-3">
         @for (med of medications(); track med.id) {
           <div class="bg-surface rounded-lg border border-border p-4 flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-900">{{ med.name }}</p>
-              <p class="text-xs text-muted mt-0.5">{{ med.dosage }} · {{ med.frequency }}</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ med.name }}</p>
+              <p class="text-xs text-muted mt-0.5">
+                {{ med.dosage }} · {{ med.frequency | ppLabel:'frequency' }}
+              </p>
             </div>
-            <span class="text-xs px-2 py-0.5 rounded-full"
-                  [class]="med.status === 'ACTIVE' ? 'bg-green-50 text-success' : 'bg-gray-100 text-muted'">
-              {{ med.status }}
+            <span class="text-xs px-2.5 py-1 rounded-full font-medium"
+                  [class]="med.status === 'ACTIVE'
+                    ? 'bg-green-50 text-success'
+                    : med.status === 'DISCONTINUED'
+                      ? 'bg-red-50 text-danger'
+                      : 'bg-gray-100 text-muted'">
+              {{ med.status | ppLabel:'medicationStatus' }}
             </span>
           </div>
         } @empty {
@@ -135,30 +165,37 @@
       </div>
     }
 
-    <!-- Tab: Rendez-vous -->
+    <!-- ── Rendez-vous ─────────────────────────────────────────────────────── -->
     @if (activeTab() === 'appointments') {
       <div class="flex justify-end mb-4">
-        <a [routerLink]="['./appointments/new']"
-           class="text-sm font-medium px-4 py-2 rounded-md bg-primary text-white hover:bg-primary-hover transition-colors">
-          + Ajouter un RDV
-        </a>
+        <button type="button" (click)="showApptModal.set(true)"
+                class="btn-primary text-sm">
+          <i class="ti ti-plus" aria-hidden="true"></i>
+          Ajouter un RDV
+        </button>
       </div>
       <div class="grid gap-3">
         @for (appt of appointments(); track appt.id) {
           <div class="bg-surface rounded-lg border border-border p-4 flex items-center justify-between">
             <div>
-              <p class="text-sm font-medium text-gray-900">{{ appt.type }}</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                {{ appt.type | ppLabel:'appointmentType' }}
+              </p>
               <p class="text-xs text-muted mt-0.5">
-                {{ appt.scheduledAt | date:'EEEE d MMMM yyyy, HH:mm' : '' : 'en' }}
+                {{ appt.scheduledAt | date:'EEEE d MMMM yyyy, HH:mm' }}
                 · {{ appt.duration }} min
               </p>
               @if (appt.location) {
-                <p class="text-xs text-muted">{{ appt.location }}</p>
+                <p class="text-xs text-muted mt-0.5">📍 {{ appt.location }}</p>
               }
             </div>
-            <span class="text-xs px-2 py-0.5 rounded-full"
-                  [class]="appt.status === 'CONFIRMED' ? 'bg-green-50 text-success' : 'bg-purple-50 text-primary'">
-              {{ appt.status }}
+            <span class="text-xs px-2.5 py-1 rounded-full font-medium"
+                  [class]="appt.status === 'CONFIRMED'
+                    ? 'bg-green-50 text-success'
+                    : appt.status === 'CANCELLED'
+                      ? 'bg-red-50 text-danger'
+                      : 'bg-purple-50 text-primary'">
+              {{ appt.status | ppLabel:'appointmentStatus' }}
             </span>
           </div>
         } @empty {
@@ -169,20 +206,21 @@
       </div>
     }
 
-    <!-- Tab: Notes -->
+    <!-- ── Notes médicales ────────────────────────────────────────────────── -->
     @if (activeTab() === 'notes') {
       <div class="flex justify-end mb-4">
-        <a [routerLink]="['./notes/new']"
-           class="text-sm font-medium px-4 py-2 rounded-md bg-primary text-white hover:bg-primary-hover transition-colors">
-          + Ajouter une note
-        </a>
+        <button type="button" (click)="showNoteModal.set(true)"
+                class="btn-primary text-sm">
+          <i class="ti ti-plus" aria-hidden="true"></i>
+          Ajouter une note
+        </button>
       </div>
       <div class="grid gap-3">
         @for (note of record()?.notes ?? []; track note.id) {
           <div class="bg-surface rounded-lg border border-border p-4">
-            <p class="text-sm text-gray-900 leading-relaxed">{{ note.content }}</p>
+            <p class="text-sm text-gray-900 dark:text-gray-100 leading-relaxed">{{ note.content }}</p>
             <p class="text-xs text-muted mt-2">
-              {{ note.createdAt | date:'d MMMM yyyy à HH:mm' : '' : 'en' }}
+              {{ note.createdAt | date:'d MMMM yyyy à HH:mm' }}
             </p>
           </div>
         } @empty {

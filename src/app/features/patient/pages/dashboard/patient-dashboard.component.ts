@@ -1,68 +1,82 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+// src/app/features/patient/pages/dashboard/patient-dashboard.component.ts
+import { Component, inject, computed } from '@angular/core';
+import { httpResource } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
+import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { MedicationService } from '../../services/medication.service';
-import { AppointmentService } from '../../services/appointment.service';
+import { ApiResponse, PaginatedData } from '../../../../core/http/api-types';
 import { Medication } from '../../../../core/models/medication.model';
 import { Appointment } from '../../../../core/models/appointment.model';
-import { MedicationCardComponent } from '../../components/medication-card/medication-card.component';
-import { AppointmentCardComponent } from '../../components/appointment-card/appointment-card.component';
-import { AdherenceBadgeComponent } from '../../components/adherence-badge/adherence-badge';
+import { PatientNote } from '../../../../core/models/patient-note.model';
+import { WelcomeCardComponent } from '../../../../shared/components/welcome-card/welcome-card.component';
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';
+import { LabelPipe } from '../../../../core/pipes/label.pipe';
 
 @Component({
   selector: 'pp-patient-dashboard',
-  standalone: true,
-  imports: [
-    RouterLink,
-    MedicationCardComponent,
-    AppointmentCardComponent,
-    AdherenceBadgeComponent,
-  ],
+  imports: [RouterLink, DatePipe, LabelPipe, WelcomeCardComponent, StatCardComponent],
   templateUrl: './patient-dashboard.component.html',
 })
-export class PatientDashboardComponent implements OnInit {
-  private readonly auth        = inject(AuthService);
-  private readonly medService  = inject(MedicationService);
-  private readonly apptService = inject(AppointmentService);
+export class PatientDashboardComponent {
+  private readonly auth = inject(AuthService);
 
-  readonly user         = this.auth.currentUser;
-  readonly medications  = signal<Medication[]>([]);
-  readonly appointments = signal<Appointment[]>([]);
-  readonly isLoading    = signal(true);
+  readonly patientId = computed(() => this.auth.currentUser()?.id ?? '');
 
-  readonly todayMedications = computed(() =>
-    this.medications().filter(m => m.status === 'ACTIVE').slice(0, 4)
-  );
+  readonly userName = computed(() => this.auth.currentUser()?.firstName ?? '');
 
-  readonly upcomingAppointments = computed(() =>
-    this.appointments()
-      .filter(a => new Date(a.scheduledAt) > new Date())
-      .slice(0, 3)
-  );
-
-  readonly adherenceScore = computed(() => {
-    const total = this.medications().length;
-    if (total === 0) return 0;
-    const active = this.medications().filter(m => m.status === 'ACTIVE').length;
-    return Math.round((active / total) * 100);
+  readonly subtitle = computed(() => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Bonjour ! Comment vous sentez-vous ce matin ?';
+    if (h < 18) return 'Bonne après-midi ! Pensez à prendre vos médicaments.';
+    return 'Bonne soirée ! Prenez soin de vous.';
   });
 
-  async ngOnInit(): Promise<void> {
-    const patientId = this.user()?.id;
-    if (!patientId) return;
+  private readonly ready = computed(() => !!this.patientId());
 
-    try {
-      const [meds, appts] = await Promise.all([
-        this.medService.getByPatient(patientId, 'ACTIVE').toPromise(),
-        this.apptService.getByPatient(patientId).toPromise(),
-      ]);
+  readonly medsRes = httpResource<ApiResponse<PaginatedData<Medication>>>(() => {
+    if (!this.ready()) return undefined;
+    return {
+      url:    `${environment.apiUrl}/medications/patient/${this.patientId()}`,
+      params: { status: 'ACTIVE', limit: '10' },
+    };
+  });
 
-      console.log('meds : ', meds);
+  readonly appointmentsRes = httpResource<ApiResponse<PaginatedData<Appointment>>>(() => {
+    if (!this.ready()) return undefined;
+    return {
+      url:    `${environment.apiUrl}/appointments`,
+      params: { patientId: this.patientId(), status: 'PENDING', limit: '1' },
+    };
+  });
 
-      this.medications.set(meds?.data ?? []);
-      this.appointments.set(appts?.data ?? []);
-    } finally {
-      this.isLoading.set(false);
-    }
-  }
+  // Le backend peut renvoyer PatientNote[] ou ApiResponse<PatientNote[]> selon la version
+  readonly notesRes = httpResource<ApiResponse<PatientNote[]> | PatientNote[]>(() => {
+    if (!this.ready()) return undefined;
+    return { url: `${environment.apiUrl}/patients/${this.patientId()}/notes` };
+  });
+
+  readonly statsLoading    = computed(() =>
+    this.medsRes.isLoading() || this.appointmentsRes.isLoading() || this.notesRes.isLoading()
+  );
+
+  readonly medications     = computed(() => this.medsRes.value()?.data?.data ?? []);
+  readonly nextAppointment = computed(() => this.appointmentsRes.value()?.data?.data?.[0] ?? null);
+  readonly activeMedsCount = computed(() => this.medsRes.value()?.data?.total ?? 0);
+
+  readonly notes = computed((): PatientNote[] => {
+    const raw = this.notesRes.value();
+    if (!raw) return [];
+    // Tableau direct
+    if (Array.isArray(raw)) return raw;
+    // Enveloppe { data: [...] }
+    const data = (raw as ApiResponse<PatientNote[]>).data;
+    if (Array.isArray(data)) return data;
+    return [];
+  });
+
+  readonly notesThisWeek = computed(() => {
+    const weekAgo = Date.now() - 7 * 86_400_000;
+    return this.notes().filter(n => new Date(n.createdAt).getTime() > weekAgo).length;
+  });
 }

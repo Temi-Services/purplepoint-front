@@ -1,0 +1,54 @@
+<!-- src/app/features/employee/modals/call-log-form-modal.component.html -->
+<pp-modal
+  title="Logger un appel"
+  size="md"
+  submitLabel="Enregistrer"
+  [loading]="isLoading()"
+  [submitDisabled]="form.invalid"
+  (closed)="closed.emit()"
+  (submitted)="onSubmit()"
+>
+  @if (error()) {
+    <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
+
+    <!-- Sélection patient -->
+    <pp-patient-search
+      (patientSelected)="onPatientSelected($event)"
+      (patientCleared)="form.patchValue({ patientId: '' })"
+    />
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Résultat <span class="text-danger">*</span>
+        </label>
+        <select formControlName="outcome" class="input">
+          @for (o of outcomes; track o.value) {
+            <option [value]="o.value">{{ o.label }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          Durée (secondes)
+        </label>
+        <input type="number" formControlName="duration" min="0" class="input" />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Notes
+      </label>
+      <textarea formControlName="notes" rows="3"
+                placeholder="Observations sur l'appel…"
+                class="input resize-none"></textarea>
+    </div>
+
+  </form>
+</pp-modal>

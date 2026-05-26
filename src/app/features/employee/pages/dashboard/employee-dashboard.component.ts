@@ -1,70 +1,80 @@
-import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import {
+  Component,
+  inject,
+  computed,
+  signal,
+  TemplateRef,
+  viewChild,
+} from '@angular/core';
+import { httpResource } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../../../core/auth/auth.service';
-import { CallService } from '../../services/call.service';
-import { OfflineCallService } from '../../services/offline-call.service';
-import { Call } from '../../../../core/models/call.model';
 import { DatePipe } from '@angular/common';
+import { environment } from '../../../../../environments/environment';
+import { AuthService } from '../../../../core/auth/auth.service';
+import { ApiResponse, PaginatedData } from '../../../../core/http/api-types';
+import { Call } from '../../../../core/models/call.model';
+import { WelcomeCardComponent } from '../../../../shared/components/welcome-card/welcome-card.component';
+import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';
+import { DataTableComponent, TableColumn } from '../../../../shared/components/data-table/data-table.component';
+import { BadgeComponent } from '../../../../shared/components/badge/badge.component';
+import { CallLogFormModalComponent } from '../../modals/call-log-form-modal.component';
 
 @Component({
   selector: 'pp-employee-dashboard',
-  standalone: true,
-  imports: [RouterLink, DatePipe],
+  imports: [
+    RouterLink,
+    DatePipe,
+    WelcomeCardComponent,
+    StatCardComponent,
+    DataTableComponent,
+    BadgeComponent,
+    CallLogFormModalComponent,
+  ],
   templateUrl: './employee-dashboard.component.html',
 })
-export class EmployeeDashboardComponent implements OnInit, OnDestroy {
+export class EmployeeDashboardComponent {
   private readonly auth = inject(AuthService);
-  private readonly callService = inject(CallService);
-  private readonly offlineService = inject(OfflineCallService);
 
-  readonly user = this.auth.currentUser;
-  readonly recentCalls = signal<Call[]>([]);
-  readonly isLoading = signal(true);
-  readonly isOnline = signal(navigator.onLine);
-  readonly pendingCount = this.offlineService.pendingCount;
+  readonly userName   = computed(() => this.auth.currentUser()?.firstName ?? '');
+  readonly employeeId = computed(() => this.auth.currentUser()?.id ?? '');
 
-  readonly todayCallCount = computed(() => {
-    const today = new Date().toDateString();
-    return this.recentCalls().filter((c) => new Date(c.calledAt).toDateString() === today).length;
+  // ─── Stats ────────────────────────────────────────────────────────────────
+  readonly todayCallsRes = httpResource<ApiResponse<PaginatedData<Call>>>(() => {
+    const today = new Date().toISOString().split('T')[0];
+    return {
+      url:    `${environment.apiUrl}/calls`,
+      params: { employeeId: this.employeeId(), date: today, limit: '1' },
+    };
   });
 
-  readonly reachedCount = computed(
-    () => this.recentCalls().filter((c) => c.outcome === 'REACHED').length,
-  );
+  readonly allCallsRes = httpResource<ApiResponse<PaginatedData<Call>>>(() => ({
+    url:    `${environment.apiUrl}/calls`,
+    params: { employeeId: this.employeeId(), limit: '5' },
+  }));
 
-  readonly contactRate = computed(() => {
-    const total = this.recentCalls().length;
-    if (total === 0) return 0;
-    return Math.round((this.reachedCount() / total) * 100);
-  });
+  readonly totalToday  = computed(() => this.todayCallsRes.value()?.data?.total ?? 0);
+  readonly totalCalls  = computed(() => this.allCallsRes.value()?.data?.total   ?? 0);
+  readonly recentCalls = computed(() => this.allCallsRes.value()?.data?.data    ?? []);
+  readonly statsLoading = computed(() => this.todayCallsRes.isLoading());
+  readonly tableLoading = computed(() => this.allCallsRes.isLoading());
 
-  private readonly onlineHandler = () => {
-    this.isOnline.set(true);
-    this.offlineService.syncQueue();
-  };
-  private readonly offlineHandler = () => this.isOnline.set(false);
+  // ─── Colonnes DataTable ────────────────────────────────────────────────────
+  readonly outcomeCell = viewChild<TemplateRef<{ $implicit: Call }>>('outcomeCell');
+  readonly dateCell    = viewChild<TemplateRef<{ $implicit: Call }>>('dateCell');
 
-  async ngOnInit(): Promise<void> {
-    window.addEventListener('online', this.onlineHandler);
-    window.addEventListener('offline', this.offlineHandler);
-    await this.loadRecentCalls();
-  }
+  readonly columns = computed<TableColumn<Call>[]>(() => [
+    { key: 'patientName', label: 'Patient' },
+    { key: 'calledAt',    label: 'Date',    template: this.dateCell() },
+    { key: 'duration',    label: 'Durée' },
+    { key: 'outcome',     label: 'Résultat', template: this.outcomeCell() },
+  ]);
 
-  ngOnDestroy(): void {
-    window.removeEventListener('online', this.onlineHandler);
-    window.removeEventListener('offline', this.offlineHandler);
-  }
+  // ─── Modal ────────────────────────────────────────────────────────────────
+  readonly showCallLog = signal(false);
 
-  private async loadRecentCalls(): Promise<void> {
-    const employeeId = this.user()?.id;
-    if (!employeeId) return;
-
-    this.isLoading.set(true);
-    try {
-      const res = await this.callService.getByEmployee(employeeId, 1, 50).toPromise();
-      this.recentCalls.set(res?.data ?? []);
-    } finally {
-      this.isLoading.set(false);
-    }
+  onSaved(): void {
+    this.todayCallsRes.reload();
+    this.allCallsRes.reload();
+    this.showCallLog.set(false);
   }
 }

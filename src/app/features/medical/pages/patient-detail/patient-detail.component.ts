@@ -1,33 +1,46 @@
+// 📁 src/app/features/medical/pages/patient-detail/patient-detail.component.ts
+// ─────────────────────────────────────────────────────────────────────────────
 import { Component, OnInit, inject, signal, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { UserService } from '../../services/user.service';
+import { firstValueFrom } from 'rxjs';
+import { AdminUserService } from '../../../admin/services/admin-user.service';
 import { MedicalRecordService } from '../../services/medical-record.service';
-import { MedicalMedicationService } from '../../services/medication.service';
-import { MedicalAppointmentService } from '../../services/appointment.service';
+import { MedicationService } from '../../services/medication.service';
+import { AppointmentService } from '../../services/appointment.service';
 import { User } from '../../../../core/models/user.model';
 import { MedicalRecord } from '../../../../core/models/medical-record.model';
 import { Medication } from '../../../../core/models/medication.model';
 import { Appointment } from '../../../../core/models/appointment.model';
 import { AdherenceBadgeComponent } from '../../../patient/components/adherence-badge/adherence-badge';
-import { firstValueFrom } from 'rxjs';
+import { LabelPipe } from '../../../../core/pipes/label.pipe';
+import { label } from '../../../../core/utils/label.utils';
+import { AppointmentFormModalComponent } from '../../modals/appointment-form-modal.component';
+import { MedicationFormModalComponent } from '../../modals/medication-form-modal.component';
+import { MedicalNoteFormModalComponent } from '../../modals/medical-note-form-modal.component';
 
 type Tab = 'record' | 'medications' | 'appointments' | 'notes';
 
 @Component({
   selector: 'pp-patient-detail',
-  standalone: true,
-  imports: [RouterLink, DatePipe, AdherenceBadgeComponent],
+  imports: [
+    RouterLink, DatePipe, AdherenceBadgeComponent, LabelPipe,
+    AppointmentFormModalComponent,
+    MedicationFormModalComponent,
+    MedicalNoteFormModalComponent,
+  ],
   templateUrl: './patient-detail.component.html',
 })
 export class PatientDetailComponent implements OnInit {
-  private readonly userService  = inject(UserService);
-  private readonly recordSvc    = inject(MedicalRecordService);
-  private readonly medSvc       = inject(MedicalMedicationService);
-  private readonly apptSvc      = inject(MedicalAppointmentService);
+  private readonly userService = inject(AdminUserService);
+  private readonly recordSvc   = inject(MedicalRecordService);
+  private readonly medSvc      = inject(MedicationService);
+  private readonly apptSvc     = inject(AppointmentService);
 
-  // withComponentInputBinding() permet de récupérer :id directement
   readonly id = input.required<string>();
+
+  // Exposé au template pour les traductions : label.bloodType(record.bloodType)
+  readonly label = label;
 
   readonly patient      = signal<User | null>(null);
   readonly record       = signal<MedicalRecord | null>(null);
@@ -35,6 +48,11 @@ export class PatientDetailComponent implements OnInit {
   readonly appointments = signal<Appointment[]>([]);
   readonly isLoading    = signal(true);
   readonly activeTab    = signal<Tab>('record');
+
+  // ─── Modales ───────────────────────────────────────────────────────────────
+  readonly showApptModal = signal(false);
+  readonly showMedModal  = signal(false);
+  readonly showNoteModal = signal(false);
 
   readonly adherenceScore = computed(() => {
     const meds = this.medications();
@@ -52,24 +70,25 @@ export class PatientDetailComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     const id = this.id();
-    this.isLoading.set(true); // ✅ activer le loader avant les appels
+    this.isLoading.set(true);
     try {
       const [patient, record, meds, appts] = await Promise.all([
+        // getById retourne User directement (BaseApiService unwrap)
         firstValueFrom(this.userService.getById(id)),
+        // getByPatient retourne MedicalRecord directement
         firstValueFrom(this.recordSvc.getByPatient(id)),
+        // getByPatient retourne PaginatedData<Medication> → .data = Medication[]
         firstValueFrom(this.medSvc.getByPatient(id)),
+        // getByPatient retourne PaginatedData<Appointment> → .data = Appointment[]
         firstValueFrom(this.apptSvc.getByPatient(id)),
       ]);
 
-      this.patient.set(patient ?? null);       // maintenant patient est User
-      this.record.set(record ?? null);         // MedicalRecord
-      this.medications.set(meds?.data ?? []);  // meds est PaginatedData → .data = tableau
-      this.appointments.set(appts?.data ?? []);// appts est PaginatedData → .data = tableau
-
-      console.log('record notes : ', this.record());
-
-    } catch (error) {
-      console.error('Error loading patient details', error);
+      this.patient.set(patient ?? null);
+      this.record.set(record  ?? null);
+      this.medications.set(meds?.data   ?? []);
+      this.appointments.set(appts?.data ?? []);
+    } catch (err) {
+      console.error('Error loading patient detail:', err);
     } finally {
       this.isLoading.set(false);
     }
@@ -77,5 +96,21 @@ export class PatientDetailComponent implements OnInit {
 
   setTab(tab: Tab): void {
     this.activeTab.set(tab);
+  }
+
+  async onModalSaved(): Promise<void> {
+    this.showApptModal.set(false);
+    this.showMedModal.set(false);
+    this.showNoteModal.set(false);
+    // Recharger les données
+    const id = this.id();
+    const [meds, appts, record] = await Promise.all([
+      firstValueFrom(this.medSvc.getByPatient(id)),
+      firstValueFrom(this.apptSvc.getByPatient(id)),
+      firstValueFrom(this.recordSvc.getByPatient(id)),
+    ]);
+    this.medications.set(meds?.data ?? []);
+    this.appointments.set(appts?.data ?? []);
+    this.record.set(record ?? null);
   }
 }

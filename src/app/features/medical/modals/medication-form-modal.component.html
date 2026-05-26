@@ -1,0 +1,79 @@
+<!-- src/app/features/medical/modals/medication-form-modal.component.html -->
+<pp-modal
+  title="Nouvelle prescription"
+  size="lg"
+  submitLabel="Prescrire"
+  [loading]="isLoading()"
+  [submitDisabled]="form.invalid"
+  (closed)="closed.emit()"
+  (submitted)="onSubmit()"
+>
+  @if (error()) {
+    <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+      {{ error() }}
+    </div>
+  }
+
+  <form [formGroup]="form" class="grid grid-cols-1 sm:grid-cols-2 gap-4" (ngSubmit)="onSubmit()">
+
+    @if (!patientId()) {
+      <div class="sm:col-span-2">
+        <pp-patient-search
+          (patientSelected)="onPatientSelected($event)"
+          (patientCleared)="form.patchValue({ patientId: '' })"
+        />
+      </div>
+    }
+
+    <div class="sm:col-span-2">
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Médicament <span class="text-danger">*</span>
+      </label>
+      <input type="text" formControlName="name"
+             placeholder="Ex. Paracétamol 500mg" class="input" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Dosage <span class="text-danger">*</span>
+      </label>
+      <input type="text" formControlName="dosage"
+             placeholder="Ex. 1 comprimé" class="input" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Fréquence <span class="text-danger">*</span>
+      </label>
+      <select formControlName="frequency" class="input">
+        @for (f of frequencies; track f) {
+          <option [value]="f">{{ f | ppLabel:'frequency' }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Date de début <span class="text-danger">*</span>
+      </label>
+      <input type="date" formControlName="startDate" class="input" />
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Date de fin
+      </label>
+      <input type="date" formControlName="endDate" class="input" />
+    </div>
+
+    <div class="sm:col-span-2">
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+        Notes
+      </label>
+      <textarea formControlName="notes" rows="3"
+                placeholder="Instructions particulières…"
+                class="input resize-none"></textarea>
+    </div>
+
+  </form>
+</pp-modal>

@@ -1,32 +1,55 @@
-import { Injectable, computed, signal, inject } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+// src/app/core/auth/auth.service.ts
+import { Injectable, computed, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import {
-  signIn,
-  signOut,
-  getCurrentUser,
-  fetchAuthSession,
-  AuthError,
-} from 'aws-amplify/auth';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { User } from '../models/user.model';
 import { UserRole } from '../models/roles.enum';
+import {
+  AuthLoginResult,
+  LoginResponse,
+  NewPasswordChallenge,
+  isChallenge,
+} from '../models/auth.model';
+
+function decodeJwtPayload(token: string): Record<string, unknown> {
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+  } catch {
+    return {};
+  }
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly router = inject(Router);
+  private readonly http       = inject(HttpClient);
+  private readonly router     = inject(Router);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly baseUrl    = `${environment.apiUrl}/auth`;
 
-  private readonly _currentUser = signal<User | null>(null);
-  private readonly _token       = signal<string | null>(null);
-  private readonly _loading     = signal<boolean>(false);
+  private readonly _currentUser      = signal<User | null>(null);
+  private readonly _accessToken      = signal<string | null>(null);
+  private readonly _loading          = signal<boolean>(false);
+  private readonly _challengePending = signal<NewPasswordChallenge | null>(null);
+  private readonly _initialized      = signal<boolean>(false);
 
-  readonly currentUser    = this._currentUser.asReadonly();
-  readonly token          = this._token.asReadonly();
-  readonly isLoading      = this._loading.asReadonly();
-  readonly isAuthenticated = computed(() => this._currentUser() !== null);
-  readonly userRole        = computed(() => this._currentUser()?.role ?? null);
+  readonly currentUser      = this._currentUser.asReadonly();
+  readonly token            = this._accessToken.asReadonly();
+  readonly isLoading        = this._loading.asReadonly();
+  readonly initialized      = this._initialized.asReadonly();
+  readonly challengePending = this._challengePending.asReadonly();
+  readonly isAuthenticated  = computed(() => this._currentUser() !== null);
+  readonly userRole         = computed(() => this._currentUser()?.role ?? null);
 
-  // Expose loading state as observable for HomeComponent
-  readonly isLoading$ = toObservable(this.isLoading);
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.restoreSession();
+    }
+    this._initialized.set(true);
+  }
 
   hasRole(role: UserRole): boolean {
     return this._currentUser()?.role === role;
@@ -37,49 +60,94 @@ export class AuthService {
     return role ? roles.includes(role) : false;
   }
 
-  /** Appelé au démarrage pour restaurer la session existante */
-  async restoreSession(): Promise<void> {
-    try {
-      this._loading.set(true);
-      const session = await fetchAuthSession();
-      const idToken = session.tokens?.idToken;
-      const accessToken = session.tokens?.accessToken;
-
-      if (!idToken || !accessToken) return;
-
-      const payload  = idToken.payload;
-      const rawAccessToken = accessToken.toString();
-
-      const user = this.mapPayloadToUser(payload);
-      this.setSession(user, rawAccessToken);
-    } catch {
-      // Pas de session active — état initial conservé (null)
-    } finally {
-      this._loading.set(false);
-    }
-  }
-
   async login(email: string, password: string): Promise<void> {
     this._loading.set(true);
+    this._challengePending.set(null);
     try {
-      await signIn({ username: email, password });
-      await this.restoreSession();
+      const raw = await firstValueFrom(
+        this.http.post<{ success: boolean; data: AuthLoginResult; timestamp: string }>(
+          `${this.baseUrl}/login`,
+          { username: email, password },
+        ),
+      );
+      const result = raw.data ?? (raw as unknown as AuthLoginResult);
+      if (isChallenge(result)) {
+        this._challengePending.set(result);
+        return;
+      }
+      this.applyTokens(result);
       this.redirectAfterLogin();
-      console.log('Login successful', this._currentUser());
     } finally {
       this._loading.set(false);
     }
   }
 
-  async logout(): Promise<void> {
-    await signOut();
-    this._currentUser.set(null);
-    this._token.set(null);
+  async newPassword(newPassword: string): Promise<void> {
+    const challenge = this._challengePending();
+    if (!challenge) throw new Error('Aucun challenge en attente.');
+    this._loading.set(true);
+    try {
+      const raw = await firstValueFrom(
+        this.http.post<{ success: boolean; data: LoginResponse; timestamp: string }>(
+          `${this.baseUrl}/new-password`,
+          { email: challenge.email, newPassword, session: challenge.session },
+        ),
+      );
+      const result = raw.data ?? (raw as unknown as LoginResponse);
+      this._challengePending.set(null);
+      this.applyTokens(result);
+      this.redirectAfterLogin();
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  restoreSession(): void {
+    const accessToken = localStorage.getItem('pp_access_token');
+    const idToken     = localStorage.getItem('pp_id_token');
+    if (!accessToken) return;
+    const accessPayload = decodeJwtPayload(accessToken);
+    const exp           = accessPayload['exp'] as number | undefined;
+    if (exp && Date.now() / 1000 > exp) {
+      this.clearSession();
+      return;
+    }
+    const idPayload = idToken ? decodeJwtPayload(idToken) : {};
+    const merged    = { ...accessPayload, ...idPayload };
+    this._currentUser.set(this.mapPayloadToUser(merged));
+    this._accessToken.set(accessToken);
+  }
+
+  logout(): void {
+    this.clearSession();
     this.router.navigate(['/login']);
+  }
+
+  private applyTokens(response: LoginResponse): void {
+    const accessPayload = decodeJwtPayload(response.accessToken);
+    const idPayload     = decodeJwtPayload(response.idToken);
+    const merged        = { ...accessPayload, ...idPayload };
+    const user          = this.mapPayloadToUser(merged);
+    localStorage.setItem('pp_access_token', response.accessToken);
+    localStorage.setItem('pp_id_token',     response.idToken);
+    this._currentUser.set(user);
+    this._accessToken.set(response.accessToken);
+  }
+
+  private clearSession(): void {
+    localStorage.removeItem('pp_access_token');
+    localStorage.removeItem('pp_id_token');
+    this._currentUser.set(null);
+    this._accessToken.set(null);
+    this._challengePending.set(null);
   }
 
   private redirectAfterLogin(): void {
     const role = this.userRole();
+    if (!role) {
+      this.router.navigate(['/unauthorized']);
+      return;
+    }
     const roleRouteMap: Record<UserRole, string> = {
       [UserRole.PATIENT]:  '/patient',
       [UserRole.MEDICAL]:  '/medical',
@@ -88,23 +156,29 @@ export class AuthService {
       [UserRole.ADMIN]:    '/admin',
       [UserRole.CEO]:      '/ceo',
     };
-    this.router.navigate([roleRouteMap[role!] ?? '/unauthorized']);
-  }
-
-  private setSession(user: User, token: string): void {
-    this._currentUser.set(user);
-    this._token.set(token);
+    const route = roleRouteMap[role];
+    if (!route) {
+      this.router.navigate(['/unauthorized']);
+      return;
+    }
+    this.router.navigate([route]);
   }
 
   private mapPayloadToUser(payload: Record<string, unknown>): User {
+    const decode = (val: unknown): string => {
+      const str = String(val ?? '');
+      try { return decodeURIComponent(escape(str)); } catch { return str; }
+    };
+    const role = (payload['custom:role'] ?? payload['role']) as UserRole | undefined;
+    const id   = (payload['custom:userId'] ?? payload['sub']) as string;
     return {
-      id:         payload['custom:userId'] as string,
-      cognitoSub: payload['sub'] as string,
-      email:      payload['email'] as string,
-      firstName:  payload['given_name'] as string ?? '',
-      lastName:   payload['family_name'] as string ?? '',
-      role:       payload['custom:role'] as UserRole,
-      region:     payload['custom:region'] as string | undefined,
+      id,
+      cognitoSub: payload['sub']        as string,
+      email:      payload['email']      as string,
+      firstName:  decode(payload['given_name']  ?? payload['name'] ?? ''),
+      lastName:   decode(payload['family_name'] ?? ''),
+      role:       role!,
+      region:     payload['custom:region'] ? decode(payload['custom:region']) : undefined,
       status:     'ACTIVE',
     };
   }

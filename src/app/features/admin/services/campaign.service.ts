@@ -1,43 +1,60 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+import { BaseApiService } from '../../../core/http/base-api.service';
+import { PaginatedData } from '../../../core/http/api-types';
 import { Campaign, CreateCampaignPayload } from '../../../core/models/campaign.model';
 
-// Ajouter l'interface ApiResponse
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  timestamp: string;
-}
+export type CampaignStatus = 'DRAFT' | 'SCHEDULED' | 'SENT' | 'CANCELLED';
 
-// Garder PaginatedResponse pour la structure interne
-interface PaginatedData<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
+export interface ListCampaignsParams {
+  page?:         number;
+  limit?:        number;
+  status?:       CampaignStatus;
+  targetRegion?: string;
 }
 
 @Injectable({ providedIn: 'root' })
-export class CampaignService {
-  private readonly http    = inject(HttpClient);
-  private readonly baseUrl = `${environment.apiUrl}/campaigns`;
+export class CampaignService extends BaseApiService<Campaign> {
+  protected readonly endpoint = '/campaigns';
 
-  getAll(page = 1, limit = 20): Observable<ApiResponse<PaginatedData<Campaign>>> {
-    const params = new HttpParams()
-      .set('page', page)
-      .set('limit', limit);
-
-    return this.http.get<ApiResponse<PaginatedData<Campaign>>>(this.baseUrl, { params });
+  // ─── GET /campaigns?page=&limit=&status=&targetRegion= ───────────────────
+  // Rôles : ADMIN, EMPLOYEE, CEO
+  override getAll(params?: ListCampaignsParams): Observable<PaginatedData<Campaign>>;
+  // Surcharge positionnelle — anciens composants appellent getAll(page, limit)
+  override getAll(page?: number, limit?: number): Observable<PaginatedData<Campaign>>;
+  override getAll(
+    paramsOrPage: ListCampaignsParams | number = {},
+    limit?: number,
+  ): Observable<PaginatedData<Campaign>> {
+    if (typeof paramsOrPage === 'number') {
+      return super.getAll({ page: paramsOrPage, limit: limit ?? 20 });
+    }
+    return super.getAll(paramsOrPage ?? {});
   }
 
-  create(payload: CreateCampaignPayload): Observable<Campaign> {
-    return this.http.post<Campaign>(this.baseUrl, payload);
+  // ─── GET /campaigns/:id ───────────────────────────────────────────────────
+  override getById(id: string): Observable<Campaign> {
+    return super.getById(id);
   }
 
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  // ─── POST /campaigns ──────────────────────────────────────────────────────
+  // Rôles : ADMIN, EMPLOYEE, CEO
+  // body : { title, message, channel, targetRegion?, targetRole?, scheduledAt? }
+  createCampaign(dto: CreateCampaignPayload): Observable<Campaign> {
+    return super.create(dto);
+  }
+
+  // ─── PATCH /campaigns/:id/send ────────────────────────────────────────────
+  // Rôles : ADMIN, CEO
+  send(id: string): Observable<Campaign> {
+    return this.http
+      .patch<Campaign>(`${this.baseUrl}/${id}/send`, {});
+  }
+
+  // ─── PATCH /campaigns/:id/cancel ─────────────────────────────────────────
+  // Rôles : ADMIN, CEO
+  cancel(id: string): Observable<Campaign> {
+    return this.http
+      .patch<Campaign>(`${this.baseUrl}/${id}/cancel`, {});
   }
 }

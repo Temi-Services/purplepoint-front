@@ -11,7 +11,6 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
   const allowed  = (route.data['roles'] as UserRole[]) ?? [];
   console.log('allowed roles:', allowed);
 
-  // Si aucun rôle exigé, on laisse passer (les enfants de la route médicale par ex.)
   if (allowed.length === 0) {
     return true;
   }
@@ -20,3 +19,5 @@ export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
     ? true
     : router.createUrlTree(['/unauthorized']);
 };
+
+

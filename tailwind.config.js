@@ -1,25 +1,22 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // Mode sombre basé sur la préférence système (media)
-  darkMode: 'media',
+  // ─── Dark mode basé sur la classe CSS (ThemeService applique/retire 'dark' sur <html>) ───
+  darkMode: 'class',
 
   content: [
-    // tes chemins de fichiers ici
     './src/**/*.{html,js,jsx,ts,tsx,vue}',
   ],
 
   theme: {
-    // Définition de la police (sans-serif par défaut)
     fontFamily: {
       sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
     },
 
-    // Extension du thème (pour ne pas écraser les valeurs par défaut)
     extend: {
       colors: {
-        // Palette Purple (copie des valeurs v4)
+        // Palette Purple PurplePoint
         purple: {
-          50: '#EEEDFE',
+          50:  '#EEEDFE',
           100: '#CECBF6',
           200: '#AFA9EC',
           400: '#7F77DD',
@@ -28,23 +25,22 @@ module.exports = {
           900: '#26215C',
         },
 
-        // Tokens sémantiques (référencent des variables CSS pour compatibilité dark mode)
-        primary: 'var(--color-primary)',
+        // Tokens sémantiques (CSS vars → compatibles dark mode via ThemeService)
+        primary:         'var(--color-primary)',
         'primary-hover': 'var(--color-primary-hover)',
         'primary-light': 'var(--color-primary-light)',
-        'primary-text': 'var(--color-primary-text)',
+        'primary-text':  'var(--color-primary-text)',
 
-        surface: 'var(--color-surface)',
+        surface:    'var(--color-surface)',
         'surface-2': 'var(--color-surface-2)',
-        border: 'var(--color-border)',
-        muted: 'var(--color-muted)',
+        border:     'var(--color-border)',
+        muted:      'var(--color-muted)',
 
         success: '#1D9E75',
         warning: '#BA7517',
-        danger: '#E24B4A',
+        danger:  '#E24B4A',
       },
 
-      // Rayon des bordures
       borderRadius: {
         sm: '6px',
         md: '10px',
