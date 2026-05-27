@@ -1,0 +1,332 @@
+{
+  "AUTH": {
+    "LOGIN": {
+      "TAGLINE": "La santé connectée,<br>au bout des doigts.",
+      "DESCRIPTION": "PurplePoint centralise le suivi médical de vos patients en temps réel, partout et en toute sécurité.",
+      "COPYRIGHT": "© {{ year }} PurplePoint Health",
+      "WELCOME": "Bon retour !",
+      "SUBTITLE": "Connectez-vous à votre espace",
+      "IDENTIFIER_LABEL": "Identifiant",
+      "IDENTIFIER_PLACEHOLDER": "Email ou numéro de téléphone",
+      "IDENTIFIER_REQUIRED": "Ce champ est requis.",
+      "PASSWORD_LABEL": "Mot de passe",
+      "PASSWORD_PLACEHOLDER": "••••••••",
+      "PASSWORD_MIN_LENGTH": "Minimum 8 caractères.",
+      "SHOW_PASSWORD": "Afficher",
+      "HIDE_PASSWORD": "Masquer",
+      "SUBMIT": "Se connecter",
+      "SUBMITTING": "Connexion…",
+      "ERROR_GENERIC": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "NEW_PASSWORD": {
+      "TITLE": "Définir votre mot de passe",
+      "INTRO": "C'est votre première connexion. Veuillez définir un mot de passe permanent.",
+      "NEW_PASSWORD_LABEL": "Nouveau mot de passe",
+      "NEW_PASSWORD_PLACEHOLDER": "8 caractères minimum",
+      "NEW_PASSWORD_MIN_LENGTH": "Minimum 8 caractères.",
+      "CONFIRM_PASSWORD_LABEL": "Confirmer le mot de passe",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Répétez le mot de passe",
+      "PASSWORD_MISMATCH": "Les mots de passe ne correspondent pas.",
+      "SUBMIT": "Confirmer"
+    }
+  },
+  "SHARED": {
+    "CONFIRM_DIALOG": {
+      "DEFAULT_TITLE": "Confirmer",
+      "DEFAULT_MESSAGE": "Cette action est irréversible. Voulez-vous continuer ?",
+      "DEFAULT_CONFIRM": "Confirmer",
+      "CANCEL": "Annuler"
+    },
+    "MODAL": {
+      "CLOSE": "Fermer",
+      "CANCEL": "Annuler",
+      "CONFIRM": "Confirmer"
+    },
+    "NOT_FOUND": {
+      "TITLE": "Page introuvable",
+      "MESSAGE": "La route demandée n'existe pas."
+    },
+    "UNAUTHORIZED": {
+      "TITLE": "Non autorisé",
+      "MESSAGE": "Vous n'êtes pas autorisé à accéder à cette page."
+    },
+    "EMPTY_STATE": {
+      "DEFAULT_TITLE": "Aucun résultat",
+      "DEFAULT_ALT": "Aucun résultat"
+    },
+    "TOPBAR": {
+      "TOGGLE_SIDEBAR": "Basculer la sidebar",
+      "LIGHT_MODE": "Passer en mode clair",
+      "DARK_MODE": "Passer en mode sombre",
+      "NOTIFICATIONS": "Notifications",
+      "LOGOUT": "Se déconnecter"
+    },
+    "SIDEBAR": {
+      "COLLAPSE": "Réduire la sidebar",
+      "EXPAND": "Agrandir la sidebar"
+    },
+    "NAVBAR": {
+      "LOGOUT": "Déconnexion"
+    },
+    "WELCOME_CARD": {
+      "GREETING": "Bonjour,"
+    },
+    "PATIENT_SEARCH": {
+      "LABEL": "Patient",
+      "CLEAR": "Effacer",
+      "NO_RESULTS": "Aucun patient trouvé pour « {{ query }} »",
+      "REQUIRED": "Veuillez sélectionner un patient."
+    }
+  },
+  "NAV": {
+    "MY_SPACE": "Mon espace",
+    "PATIENTS": "Patients",
+    "MY_CALLS": "Mes appels",
+    "ADMINISTRATION": "Administration",
+    "ANALYTICS": "Analytics",
+    "MY_MEDICATIONS": "Mes médicaments",
+    "MY_APPOINTMENTS": "Mes rendez-vous",
+    "MY_RECORD": "Mon dossier",
+    "MY_NOTES": "Mes notes",
+    "DASHBOARD": "Tableau de bord",
+    "USERS": "Utilisateurs",
+    "CAMPAIGNS": "Campagnes"
+  },
+  "LABELS": {
+    "FREQUENCY": {
+      "ONCE_DAILY": "1× par jour",
+      "TWICE_DAILY": "2× par jour",
+      "THREE_TIMES_DAILY": "3× par jour",
+      "WEEKLY": "1× par semaine",
+      "AS_NEEDED": "À la demande"
+    },
+    "BLOOD_TYPE": {
+      "UNKNOWN": "Inconnu"
+    },
+    "APPOINTMENT_TYPE": {
+      "CONSULTATION": "Consultation",
+      "FOLLOW_UP": "Suivi",
+      "EMERGENCY": "Urgence",
+      "HOME_VISIT": "Visite à domicile"
+    },
+    "APPOINTMENT_STATUS": {
+      "PENDING": "En attente",
+      "CONFIRMED": "Confirmé",
+      "CANCELLED": "Annulé",
+      "COMPLETED": "Terminé",
+      "NO_SHOW": "Absent"
+    },
+    "MEDICATION_STATUS": {
+      "ACTIVE": "Actif",
+      "DISCONTINUED": "Arrêté",
+      "COMPLETED": "Terminé"
+    },
+    "INTAKE_STATUS": {
+      "TAKEN": "Pris",
+      "MISSED": "Manqué",
+      "SKIPPED": "Sauté"
+    },
+    "ROLE": {
+      "PATIENT": "Patient",
+      "MEDICAL": "Médecin",
+      "ADMIN": "Administrateur",
+      "EMPLOYEE": "Employé",
+      "CEO": "Directeur",
+      "AIDANT": "Aidant"
+    },
+    "USER_STATUS": {
+      "ACTIVE": "Actif",
+      "INACTIVE": "Inactif",
+      "SUSPENDED": "Suspendu"
+    },
+    "CALL_OUTCOME": {
+      "REACHED": "Contact abouti",
+      "NO_ANSWER": "Sans réponse",
+      "BUSY": "Occupé",
+      "WRONG_NUMBER": "Mauvais numéro",
+      "CALLBACK_REQUESTED": "Rappel demandé"
+    },
+    "CAMPAIGN_STATUS": {
+      "DRAFT": "Brouillon",
+      "SCHEDULED": "Planifié",
+      "SENT": "Envoyé",
+      "CANCELLED": "Annulé"
+    },
+    "NOTE_TYPE": {
+      "TEXT": "Texte",
+      "VOICE": "Vocal"
+    },
+    "DATA_TABLE": {
+      "EMPTY_DESCRIPTION": "Il n'y a rien à afficher pour le moment.",
+      "EDIT": "Modifier",
+      "DELETE": "Supprimer"
+    },
+    "PAGINATION": "{{ start }}–{{ end }} sur {{ total }}",
+    "PATIENT": {
+      "DASHBOARD": {
+        "IMAGE_ALT": "Tableau de bord patient",
+        "STAT_MEDS": "Médicaments actifs",
+        "STAT_NEXT_APPT": "Prochain RDV",
+        "STAT_NOTES": "Notes cette semaine",
+        "TODAY_MEDS": "Médicaments du jour",
+        "SEE_ALL": "Voir tous",
+        "NO_MEDS": "Aucun médicament actif.",
+        "QUICK_ACCESS": "Accès rapides",
+        "NEXT_APPT": "Prochain rendez-vous",
+        "QUICK_ACTIONS_ALT": "Actions rapides"
+      },
+      "SUBTITLE_MORNING": "Bonjour ! Comment vous sentez-vous ce matin ?",
+      "SUBTITLE_AFTERNOON": "Bonne après-midi ! Pensez à prendre vos médicaments.",
+      "SUBTITLE_EVENING": "Bonne soirée ! Prenez soin de vous.",
+      "APPOINTMENTS": {
+        "TITLE": "Mes rendez-vous",
+        "SUBTITLE": "Historique et rendez-vous à venir",
+        "TAB_UPCOMING": "À venir",
+        "TAB_PAST": "Passés",
+        "EMPTY_UPCOMING": "Aucun rendez-vous à venir.",
+        "EMPTY_PAST": "Aucun rendez-vous passé.",
+        "MEDICATIONS": {
+          "TITLE": "Mes traitements",
+          "SUBTITLE": "Suivi de vos médicaments",
+          "TAB_ACTIVE": "En cours",
+          "TAB_COMPLETED": "Terminés",
+          "TAB_DISCONTINUED": "Arrêtés",
+          "EMPTY_ACTIVE": "Aucun traitement en cours.",
+          "EMPTY_COMPLETED": "Aucun traitement terminé.",
+          "EMPTY_DISCONTINUED": "Aucun traitement arrêté."
+        }
+      },
+      "NOTES": {
+        "TITLE": "Mes notes",
+        "COUNT_SINGULAR": "{{ count }} note",
+        "COUNT_PLURAL": "{{ count }} notes",
+        "NEW_NOTE": "Nouvelle note",
+        "FILTER_ALL": "Tous les rendez-vous",
+        "FILTER_APPT": "RDV du",
+        "EMPTY_ALT": "Aucune note",
+        "EMPTY_TITLE": "Vous n'avez pas encore de notes",
+        "EMPTY_DESC": "Créez votre première note pour suivre vos symptômes et ressentis.",
+        "EMPTY_CTA": "Créer ma première note",
+        "TRANSCRIBED": "Transcrit",
+        "TRANSCRIBING": "Transcription en attente",
+        "LINKED_APPT": "Lié à un rendez-vous",
+        "TIME_NOW": "à l'instant",
+        "TIME_MINS": "il y a {{ mins }} min",
+        "TIME_HOURS": "il y a {{ hours }}h",
+        "TIME_DAYS": "il y a {{ days }} j"
+      },
+      "MEDICAL_RECORD": {
+        "TITLE": "Mon dossier médical",
+        "SUBTITLE_VIEW": "Vos informations de santé",
+        "SUBTITLE_CREATE": "Complétez vos informations médicales",
+        "EDIT": "Modifier",
+        "BLOOD_TYPE": "Groupe sanguin",
+        "ALLERGIES": "Allergies",
+        "ALLERGIES_PLACEHOLDER": "Ex : Pénicilline, Arachides",
+        "NO_ALLERGIES": "Aucune allergie connue.",
+        "CHRONIC_DISEASES": "Maladies chroniques",
+        "CHRONIC_PLACEHOLDER": "Ex : Diabète type 2, Hypertension",
+        "NO_CHRONIC": "Aucune maladie chronique renseignée.",
+        "MEDICAL_NOTES": "Notes médicales",
+        "LAST_UPDATED": "Dernière mise à jour :",
+        "CREATE_HINT": "Vous n'avez pas encore de dossier médical. Renseignez vos informations ci-dessous pour que l'équipe médicale puisse mieux vous suivre.",
+        "SAVE_CREATE": "Créer mon dossier",
+        "SAVE_EDIT": "Enregistrer"
+      },
+      "NOTE_MODAL": {
+        "TITLE": "Nouvelle note",
+        "TAB_TEXT": "Texte",
+        "TAB_VOICE": "Vocal",
+        "CONTENT_LABEL": "Contenu",
+        "CONTENT_PLACEHOLDER": "Décrivez vos symptômes, remarques, ressentis…",
+        "APPT_LABEL": "Rendez-vous associé",
+        "APPT_NONE": "Aucun rendez-vous",
+        "START_RECORDING": "Démarrer l'enregistrement",
+        "STOP_RECORDING": "Arrêter l'enregistrement",
+        "PREVIEW": "Aperçu de l'enregistrement",
+        "RESTART": "Recommencer",
+        "INSTRUCTION": "Appuyez sur le micro pour démarrer.",
+        "FORMATS": "Formats acceptés : webm, mp4, wav · Max {{ maxMB }} MB",
+        "SUBMIT_TEXT": "Enregistrer",
+        "SUBMIT_VOICE": "Envoyer",
+        "MIC_ERROR": "Accès au microphone refusé. Vérifiez les permissions.",
+        "SIZE_ERROR": "Le fichier audio dépasse {{ maxMB }} MB."
+      },
+      "MED_CARD": {
+        "CONFIRM_TITLE": "Confirmer la prise",
+        "CONFIRM_MESSAGE": "Avez-vous bien pris {{ name }} ({{ dosage }}) aujourd'hui ?",
+        "CONFIRM_LABEL": "Oui, je l'ai pris",
+        "TAKEN_TODAY": "Pris aujourd'hui",
+        "TAKEN": "Pris",
+        "MARK_TAKEN": "Marquer comme pris",
+        "INTAKE_NOTE": "Pris le {{ date }}"
+      },
+      "SHARED": {
+        "OPTIONAL": "optionnel",
+        "CANCEL": "Annuler"
+      }
+    },
+    "EMPLOYEE": {
+      "DASHBOARD": {
+        "SUBTITLE": "Gérez vos appels patients",
+        "IMAGE_ALT": "Tableau de bord employé",
+        "STAT_TODAY": "Appels du jour",
+        "STAT_TOTAL": "Total appels",
+        "RECENT_CALLS": "Appels récents",
+        "SEE_ALL": "Voir tous →",
+        "QUICK_ACCESS": "Accès rapides",
+        "LOG_CALL": "Logger un appel"
+      },
+      "CALL_HISTORY": {
+        "TITLE": "Historique des appels",
+        "SUBTITLE_SINGULAR": "{{ total }} appel enregistré",
+        "SUBTITLE_PLURAL": "{{ total }} appels enregistrés",
+        "NEW_CALL": "+ Nouvel appel",
+        "PENDING_SYNC": "{{ count }} appel(s) locaux en attente de synchronisation",
+        "COL_PATIENT": "Patient",
+        "COL_DATE": "Date",
+        "COL_DURATION": "Durée",
+        "COL_OUTCOME": "Résultat",
+        "COL_NOTES": "Notes",
+        "EMPTY": "Aucun appel enregistré.",
+        "PAGE_INFO": "Page {{ page }} sur {{ total }}",
+        "PREV": "Précédent",
+        "NEXT": "Suivant"
+      },
+      "CALL_LOG_FORM": {
+        "TITLE": "Enregistrer un appel",
+        "SUBTITLE_ONLINE": "Remplissez les informations de l'appel",
+        "SUBTITLE_OFFLINE": "Hors ligne — l'appel sera synchronisé à la reconnexion",
+        "PATIENT_LABEL": "Patient *",
+        "PATIENT_PLACEHOLDER": "Rechercher un patient",
+        "PATIENT_REQUIRED": "Veuillez sélectionner un patient.",
+        "OUTCOME_LABEL": "Résultat *",
+        "DURATION_LABEL": "Durée (secondes)",
+        "DURATION_HINT": "optionnel, calculée auto sinon",
+        "DURATION_PLACEHOLDER": "Ex: 120",
+        "NOTES_LABEL": "Notes",
+        "NOTES_PLACEHOLDER": "Observations, informations remontées par le patient",
+        "CANCEL": "Annuler",
+        "SUBMIT_LOADING": "Enregistrement…",
+        "SUBMIT_ONLINE": "Enregistrer",
+        "SUBMIT_OFFLINE": "Enregistrer (hors ligne)",
+        "ERROR_SAVE": "Erreur lors de l'enregistrement. Réessayez."
+      },
+      "CALL_LOG_MODAL": {
+        "TITLE": "Logger un appel",
+        "OUTCOME_LABEL": "Résultat *",
+        "DURATION_LABEL": "Durée (secondes)",
+        "NOTES_LABEL": "Notes",
+        "NOTES_PLACEHOLDER": "Observations sur l'appel",
+        "SUBMIT": "Enregistrer",
+        "ERROR_GENERIC": "Une erreur est survenue. Veuillez réessayer."
+      },
+      "COLUMNS": {
+        "PATIENT": "Patient",
+        "DATE": "Date",
+        "DURATION": "Durée",
+        "OUTCOME": "Résultat"
+      }
+    }
+  }
+}

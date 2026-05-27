@@ -1,18 +1,19 @@
-// 📁 src/app/features/auth/login/login.component.ts
-// ─────────────────────────────────────────────────────────────────────────────
+// src/app/features/auth/login/login.component.ts
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/auth/auth.service';
 import { NewPasswordModalComponent } from '../new-password/new-password-modal.component';
 
 @Component({
   selector: 'pp-login',
-  imports: [ReactiveFormsModule, NewPasswordModalComponent],
+  imports: [ReactiveFormsModule, NewPasswordModalComponent, TranslateModule],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
-  private readonly fb   = inject(FormBuilder);
+  private readonly fb        = inject(FormBuilder);
+  private readonly translate = inject(TranslateService);
   readonly auth = inject(AuthService);
 
   readonly isLoading        = this.auth.isLoading;
@@ -22,7 +23,6 @@ export class LoginComponent {
   readonly currentYear      = new Date().getFullYear();
 
   readonly form = this.fb.nonNullable.group({
-    // Accepte email ou numéro de téléphone — pas de validation de format
     identifier: ['', [Validators.required]],
     password:   ['', [Validators.required, Validators.minLength(8)]],
   });
@@ -32,10 +32,8 @@ export class LoginComponent {
       this.form.markAllAsTouched();
       return;
     }
-
     this.error.set(null);
     const { identifier, password } = this.form.getRawValue();
-
     try {
       await this.auth.login(identifier.trim(), password);
     } catch (err: unknown) {
@@ -44,13 +42,14 @@ export class LoginComponent {
   }
 
   private parseError(err: unknown): string {
+    const fallback = this.translate.instant('AUTH.LOGIN.ERROR_GENERIC');
     if (err instanceof HttpErrorResponse) {
       const msg: string = err.error?.message ?? err.message ?? '';
-      return msg || 'Une erreur est survenue. Veuillez réessayer.';
+      return msg || fallback;
     }
     if (err instanceof Error) {
-      return err.message || 'Une erreur est survenue. Veuillez réessayer.';
+      return err.message || fallback;
     }
-    return 'Une erreur est survenue. Veuillez réessayer.';
+    return fallback;
   }
 }

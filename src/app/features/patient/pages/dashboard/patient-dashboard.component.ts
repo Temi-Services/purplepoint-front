@@ -1,4 +1,3 @@
-// src/app/features/patient/pages/dashboard/patient-dashboard.component.ts
 import { Component, inject, computed } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
@@ -12,14 +11,18 @@ import { PatientNote } from '../../../../core/models/patient-note.model';
 import { WelcomeCardComponent } from '../../../../shared/components/welcome-card/welcome-card.component';
 import { StatCardComponent } from '../../../../shared/components/stat-card/stat-card.component';
 import { LabelPipe } from '../../../../core/pipes/label.pipe';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'pp-patient-dashboard',
-  imports: [RouterLink, DatePipe, LabelPipe, WelcomeCardComponent, StatCardComponent],
+  imports: [RouterLink, DatePipe, LabelPipe, WelcomeCardComponent, StatCardComponent, TranslateModule],
   templateUrl: './patient-dashboard.component.html',
 })
 export class PatientDashboardComponent {
+
   private readonly auth = inject(AuthService);
+
+  private readonly translate = inject(TranslateService);
 
   readonly patientId = computed(() => this.auth.currentUser()?.id ?? '');
 
@@ -27,9 +30,9 @@ export class PatientDashboardComponent {
 
   readonly subtitle = computed(() => {
     const h = new Date().getHours();
-    if (h < 12) return 'Bonjour ! Comment vous sentez-vous ce matin ?';
-    if (h < 18) return 'Bonne après-midi ! Pensez à prendre vos médicaments.';
-    return 'Bonne soirée ! Prenez soin de vous.';
+    if (h < 12) return this.translate.instant('PATIENT.DASHBOARD.SUBTITLE_MORNING');
+    if (h < 18) return this.translate.instant('PATIENT.DASHBOARD.SUBTITLE_AFTERNOON');
+    return this.translate.instant('PATIENT.DASHBOARD.SUBTITLE_EVENING');
   });
 
   private readonly ready = computed(() => !!this.patientId());

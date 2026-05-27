@@ -1,5 +1,5 @@
 <pp-modal
-  title="Nouvelle note"
+  [title]="'PATIENT.NOTE_MODAL.TITLE' | translate"
   size="md"
   [submitLabel]="submitLabel()"
   [loading]="isLoading()"
@@ -7,8 +7,7 @@
   (closed)="closed.emit()"
   (submitted)="onSubmit()"
 >
-
-  <!-- ── Onglets ─────────────────────────────────────────────────────────── -->
+  <!-- Onglets -->
   <div class="flex gap-1 p-1 bg-surface-2 rounded-lg mb-5">
     <button
       type="button"
@@ -21,7 +20,7 @@
       [class.text-muted]="activeTab() !== 'text'"
     >
       <i class="ti ti-notes mr-1.5" aria-hidden="true"></i>
-      Texte
+      {{ 'PATIENT.NOTE_MODAL.TAB_TEXT' | translate }}
     </button>
     <button
       type="button"
@@ -34,51 +33,45 @@
       [class.text-muted]="activeTab() !== 'voice'"
     >
       <i class="ti ti-microphone mr-1.5" aria-hidden="true"></i>
-      Vocal
+      {{ 'PATIENT.NOTE_MODAL.TAB_VOICE' | translate }}
     </button>
   </div>
 
-  <!-- ── Erreur globale ──────────────────────────────────────────────────── -->
   @if (error()) {
     <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
       {{ error() }}
     </div>
   }
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- Onglet TEXTE                                                           -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- Onglet TEXTE -->
   @if (activeTab() === 'text') {
     <div class="flex flex-col gap-4">
-
-      <!-- Textarea auto-grow -->
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Contenu <span class="text-danger">*</span>
+          {{ 'PATIENT.NOTE_MODAL.CONTENT_LABEL' | translate }} <span class="text-danger">*</span>
         </label>
         <textarea
           [ngModel]="textContent()"
           (ngModelChange)="textContent.set($event)"
           rows="5"
-          placeholder="Décrivez vos symptômes, remarques, ressentis…"
+          [placeholder]="'PATIENT.NOTE_MODAL.CONTENT_PLACEHOLDER' | translate"
           class="input resize-none leading-relaxed"
           style="field-sizing: content; min-height: 7rem;"
         ></textarea>
       </div>
 
-      <!-- Select rendez-vous -->
       @if (appointments().length > 0) {
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Rendez-vous associé
-            <span class="text-muted font-normal">(optionnel)</span>
+            {{ 'PATIENT.NOTE_MODAL.APPT_LABEL' | translate }}
+            <span class="text-muted font-normal">({{ 'SHARED.OPTIONAL' | translate }})</span>
           </label>
           <select
             [ngModel]="textAppointmentId()"
             (ngModelChange)="textAppointmentId.set($event)"
             class="input"
           >
-            <option value="">Aucun rendez-vous</option>
+            <option value="">{{ 'PATIENT.NOTE_MODAL.APPT_NONE' | translate }}</option>
             @for (appt of appointments(); track appt.id) {
               <option [value]="appt.id">
                 {{ appt.scheduledAt | date:'dd/MM/yyyy HH:mm' }} — {{ appt.type }}
@@ -87,20 +80,13 @@
           </select>
         </div>
       }
-
     </div>
   }
 
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
-  <!-- Onglet VOCAL                                                           -->
-  <!-- ══════════════════════════════════════════════════════════════════════ -->
+  <!-- Onglet VOCAL -->
   @if (activeTab() === 'voice') {
     <div class="flex flex-col items-center gap-5">
-
-      <!-- Bouton micro + timer -->
       <div class="flex flex-col items-center gap-3 py-4">
-
-        <!-- Bouton enregistrement -->
         <button
           type="button"
           (click)="toggleRecording()"
@@ -113,7 +99,7 @@
           [class.ring-4]="isRecording()"
           [class.ring-red-200]="isRecording()"
           [class.bg-primary]="!isRecording()"
-          [attr.aria-label]="isRecording() ? 'Arrêter l\'enregistrement' : 'Démarrer l\'enregistrement'"
+          [attr.aria-label]="(isRecording() ? 'PATIENT.NOTE_MODAL.STOP_RECORDING' : 'PATIENT.NOTE_MODAL.START_RECORDING') | translate"
         >
           <i
             [class]="isRecording()
@@ -123,14 +109,12 @@
           ></i>
         </button>
 
-        <!-- Timer -->
         <span class="text-2xl font-mono font-semibold tracking-widest"
               [class.text-danger]="isRecording()"
               [class.text-muted]="!isRecording()">
           {{ timerLabel() }}
         </span>
 
-        <!-- Barre de son animée (CSS, visible uniquement en cours d'enregistrement) -->
         @if (isRecording()) {
           <div class="flex items-end gap-0.5 h-6" aria-hidden="true">
             @for (i of [1,2,3,4,5,6,7,8]; track i) {
@@ -142,54 +126,42 @@
             }
           </div>
         }
-
       </div>
 
-      <!-- Preview audio après enregistrement -->
       @if (audioUrl()) {
         <div class="w-full flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Aperçu de l'enregistrement
+              {{ 'PATIENT.NOTE_MODAL.PREVIEW' | translate }}
             </span>
-            <button
-              type="button"
-              (click)="resetRecording()"
-              class="text-xs text-danger hover:underline"
-            >
+            <button type="button" (click)="resetRecording()" class="text-xs text-danger hover:underline">
               <i class="ti ti-trash mr-1" aria-hidden="true"></i>
-              Recommencer
+              {{ 'PATIENT.NOTE_MODAL.RESTART' | translate }}
             </button>
           </div>
-          <audio
-            [src]="audioUrl()!"
-            controls
-            class="w-full h-10 rounded-lg"
-          ></audio>
+          <audio [src]="audioUrl()!" controls class="w-full h-10 rounded-lg"></audio>
         </div>
       }
 
-      <!-- Instruction -->
       @if (!isRecording() && !audioUrl()) {
         <p class="text-sm text-muted text-center leading-relaxed max-w-xs">
-          Appuyez sur le micro pour démarrer.<br>
-          Formats acceptés : webm, mp4, wav · Max {{ maxMB }} MB
+          {{ 'PATIENT.NOTE_MODAL.INSTRUCTION' | translate }}<br>
+          {{ 'PATIENT.NOTE_MODAL.FORMATS' | translate : { maxMB: maxMB } }}
         </p>
       }
 
-      <!-- Select rendez-vous -->
       @if (appointments().length > 0) {
         <div class="w-full">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Rendez-vous associé
-            <span class="text-muted font-normal">(optionnel)</span>
+            {{ 'PATIENT.NOTE_MODAL.APPT_LABEL' | translate }}
+            <span class="text-muted font-normal">({{ 'SHARED.OPTIONAL' | translate }})</span>
           </label>
           <select
             [ngModel]="voiceAppointmentId()"
             (ngModelChange)="voiceAppointmentId.set($event)"
             class="input"
           >
-            <option value="">Aucun rendez-vous</option>
+            <option value="">{{ 'PATIENT.NOTE_MODAL.APPT_NONE' | translate }}</option>
             @for (appt of appointments(); track appt.id) {
               <option [value]="appt.id">
                 {{ appt.scheduledAt | date:'dd/MM/yyyy HH:mm' }} — {{ appt.type }}
@@ -198,8 +170,6 @@
           </select>
         </div>
       }
-
     </div>
   }
-
 </pp-modal>

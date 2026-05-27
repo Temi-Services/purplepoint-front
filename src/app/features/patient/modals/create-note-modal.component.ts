@@ -12,6 +12,7 @@ import { PatientNoteService } from '../services/patient-note.service';
 import { Appointment } from '../../../core/models/appointment.model';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { DatePipe } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 export type NoteTab = 'text' | 'voice';
 
@@ -20,11 +21,14 @@ const ACCEPTED_TYPES = ['audio/webm', 'audio/mp4', 'audio/wav'];
 
 @Component({
   selector: 'pp-create-note-modal',
-  imports: [FormsModule, ModalComponent, DatePipe],
+  imports: [FormsModule, ModalComponent, DatePipe, TranslateModule],
   templateUrl: './create-note-modal.component.html',
 })
 export class CreateNoteModalComponent implements OnDestroy {
+
   private readonly noteService = inject(PatientNoteService);
+
+  private readonly translate = inject(TranslateService);
 
   readonly patientId = input.required<string>();
   readonly appointments = input<Appointment[]>([]);
@@ -60,7 +64,11 @@ export class CreateNoteModalComponent implements OnDestroy {
     return this.audioBlob() === null;
   });
 
-  readonly submitLabel = computed(() => (this.activeTab() === 'text' ? 'Enregistrer' : 'Envoyer'));
+  readonly submitLabel = computed(() =>
+    this.translate.instant(
+      this.activeTab() === 'text' ? 'PATIENT.NOTE_MODAL.SUBMIT_TEXT' : 'PATIENT.NOTE_MODAL.SUBMIT_VOICE'
+    )
+  );
 
   readonly timerLabel = computed(() => {
     const s = this.recordingSeconds();
@@ -100,7 +108,7 @@ export class CreateNoteModalComponent implements OnDestroy {
       this.mediaRecorder.onstop = () => {
         const blob = new Blob(this.chunks, { type: 'audio/webm' });
         if (blob.size > MAX_AUDIO_MB * 1024 * 1024) {
-          this.error.set(`Le fichier audio dépasse ${MAX_AUDIO_MB} MB.`);
+          this.error.set(this.translate.instant('PATIENT.NOTE_MODAL.SIZE_ERROR', { maxMB: MAX_AUDIO_MB }));
           return;
         }
         this.audioBlob.set(blob);
@@ -115,7 +123,7 @@ export class CreateNoteModalComponent implements OnDestroy {
         this.recordingSeconds.update((s) => s + 1);
       }, 1000);
     } catch {
-      this.error.set('Accès au microphone refusé. Vérifiez les permissions.');
+      this.error.set(this.translate.instant('PATIENT.NOTE_MODAL.MIC_ERROR'));
     }
   }
 
@@ -165,7 +173,7 @@ export class CreateNoteModalComponent implements OnDestroy {
       this.saved.emit();
       this.closed.emit();
     } catch {
-      this.error.set('Une erreur est survenue. Veuillez réessayer.');
+      this.error.set(this.translate.instant('AUTH.LOGIN.ERROR_GENERIC'));
     } finally {
       this.isLoading.set(false);
     }

@@ -1,6 +1,10 @@
 import { Component, input, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Appointment } from '../../../../core/models/appointment.model';
+import { TranslateModule } from '@ngx-translate/core';
+import { LabelPipe } from '../../../../core/pipes/label.pipe';
+import { TranslateService } from '@ngx-translate/core';
+import { inject } from '@angular/core';
 
 const TYPE_LABEL: Record<string, string> = {
   CONSULTATION: 'Consultation',
@@ -19,12 +23,17 @@ const STATUS_STYLE: Record<string, string> = {
 @Component({
   selector: 'pp-appointment-card',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, TranslateModule, LabelPipe],
   templateUrl: './appointment-card.component.html',
 })
 export class AppointmentCardComponent {
   readonly appointment = input.required<Appointment>();
+  private readonly translate = inject(TranslateService);
 
-  readonly typeLabel   = computed(() => TYPE_LABEL[this.appointment().type]   ?? this.appointment().type);
+  readonly typeLabel = computed(() =>
+    this.translate.instant(
+      'LABELS.APPOINTMENT_TYPE.' + this.appointment().type
+    ) ?? this.appointment().type
+  );
   readonly statusStyle = computed(() => STATUS_STYLE[this.appointment().status] ?? '');
 }

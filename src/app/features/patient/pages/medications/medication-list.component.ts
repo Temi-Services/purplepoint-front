@@ -6,10 +6,12 @@ import { MedicationService } from '../../services/medication.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Medication, MedicationStatus } from '../../../../core/models/medication.model';
 import { MedicationCardComponent } from '../../components/medication-card/medication-card.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { computed } from '@angular/core';
 
 @Component({
   selector: 'pp-medication-list',
-  imports: [MedicationCardComponent],
+  imports: [MedicationCardComponent, TranslateModule],
   templateUrl: './medication-list.component.html',
 })
 export class MedicationListComponent implements OnInit {
@@ -20,11 +22,20 @@ export class MedicationListComponent implements OnInit {
   readonly isLoading   = signal(true);
   readonly activeTab   = signal<MedicationStatus>('ACTIVE');
 
-  readonly tabs: { key: MedicationStatus; label: string }[] = [
-    { key: 'ACTIVE',       label: 'En cours'  },
-    { key: 'COMPLETED',    label: 'Terminés'  },
-    { key: 'DISCONTINUED', label: 'Arrêtés'   },
+  readonly tabs: { key: MedicationStatus; labelKey: string }[] = [
+    { key: 'ACTIVE',       labelKey: 'PATIENT.MEDICATIONS.TAB_ACTIVE' },
+    { key: 'COMPLETED',    labelKey: 'PATIENT.MEDICATIONS.TAB_COMPLETED' },
+    { key: 'DISCONTINUED', labelKey: 'PATIENT.MEDICATIONS.TAB_DISCONTINUED' },
   ];
+
+  readonly emptyLabel = computed(() => {
+    const map: Record<MedicationStatus, string> = {
+      ACTIVE:       'PATIENT.MEDICATIONS.EMPTY_ACTIVE',
+      COMPLETED:    'PATIENT.MEDICATIONS.EMPTY_COMPLETED',
+      DISCONTINUED: 'PATIENT.MEDICATIONS.EMPTY_DISCONTINUED',
+    };
+    return map[this.activeTab()];
+  });
 
   async ngOnInit(): Promise<void> {
     await this.loadMedications();

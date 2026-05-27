@@ -1,25 +1,27 @@
+// src/app/shared/components/empty-state/empty-state.component.ts
 import { Component, input, output } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'pp-empty-state',
+  imports: [TranslateModule],
   template: `
     <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
       @if (imageUrl()) {
         <img
           [src]="imageUrl()"
-          [alt]="imageAlt()"
+          [alt]="imageAlt() || ('SHARED.EMPTY_STATE.DEFAULT_ALT' | translate)"
           class="w-48 h-48 object-contain mb-6 opacity-80"
           loading="lazy"
         />
       } @else {
-        <!-- Icône générique si pas d'image Storyset -->
         <div class="w-16 h-16 rounded-full bg-surface-2 flex items-center justify-center mb-6">
           <i class="ti ti-inbox-off text-3xl text-muted" aria-hidden="true"></i>
         </div>
       }
 
       <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100 mb-1">
-        {{ title() }}
+        {{ title() || ('SHARED.EMPTY_STATE.DEFAULT_TITLE' | translate) }}
       </h3>
 
       @if (description()) {
@@ -46,11 +48,10 @@ import { Component, input, output } from '@angular/core';
 })
 export class EmptyStateComponent {
   readonly imageUrl    = input<string>('');
-  readonly imageAlt    = input<string>('Aucun résultat');
-  readonly title       = input<string>('Aucun résultat');
+  readonly imageAlt    = input<string>('');
+  readonly title       = input<string>('');
   readonly description = input<string>('');
   readonly ctaLabel    = input<string | null>(null);
   readonly ctaIcon     = input<string>('ti-plus');
-
-  readonly ctaClick = output<void>();
+  readonly ctaClick    = output<void>();
 }

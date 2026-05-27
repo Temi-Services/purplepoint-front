@@ -1,54 +1,56 @@
+// src/app/shared/components/sidebar/sidebar.component.ts
 import { Component, input, output, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { UserRole } from '../../../core/models/roles.enum';
 
 interface NavItem {
-  label: string;
+  labelKey: string;
   icon: string;
   route: string;
 }
 
 const NAV_ITEMS: Record<UserRole, NavItem[]> = {
   [UserRole.PATIENT]: [
-    { label: 'Mon espace',       icon: 'ti-home',          route: '/patient' },
-    { label: 'Mes médicaments',  icon: 'ti-pill',          route: '/patient/medications' },
-    { label: 'Mes rendez-vous',  icon: 'ti-calendar',      route: '/patient/appointments' },
-    { label: 'Mon dossier',      icon: 'ti-report-medical',  route: '/patient/medical-record' },
-    { label: 'Mes notes',        icon: 'ti-notes',         route: '/patient/notes' },
+    { labelKey: 'NAV.MY_SPACE',        icon: 'ti-home',           route: '/patient' },
+    { labelKey: 'NAV.MY_MEDICATIONS',  icon: 'ti-pill',           route: '/patient/medications' },
+    { labelKey: 'NAV.MY_APPOINTMENTS', icon: 'ti-calendar',       route: '/patient/appointments' },
+    { labelKey: 'NAV.MY_RECORD',       icon: 'ti-report-medical', route: '/patient/medical-record' },
+    { labelKey: 'NAV.MY_NOTES',        icon: 'ti-notes',          route: '/patient/notes' },
   ],
   [UserRole.AIDANT]: [
-    { label: 'Mon espace',       icon: 'ti-home',          route: '/patient' },
-    { label: 'Mes médicaments',  icon: 'ti-pill',          route: '/patient/medications' },
-    { label: 'Mes rendez-vous',  icon: 'ti-calendar',      route: '/patient/appointments' },
-    { label: 'Mon dossier',      icon: 'ti-report-medical',  route: '/patient/medical-record' },
-    { label: 'Mes notes',        icon: 'ti-notes',         route: '/patient/notes' },
+    { labelKey: 'NAV.MY_SPACE',        icon: 'ti-home',           route: '/patient' },
+    { labelKey: 'NAV.MY_MEDICATIONS',  icon: 'ti-pill',           route: '/patient/medications' },
+    { labelKey: 'NAV.MY_APPOINTMENTS', icon: 'ti-calendar',       route: '/patient/appointments' },
+    { labelKey: 'NAV.MY_RECORD',       icon: 'ti-report-medical', route: '/patient/medical-record' },
+    { labelKey: 'NAV.MY_NOTES',        icon: 'ti-notes',          route: '/patient/notes' },
   ],
   [UserRole.MEDICAL]: [
-    { label: 'Tableau de bord',  icon: 'ti-home',          route: '/medical' },
-    { label: 'Patients',         icon: 'ti-users',         route: '/medical/patients' },
+    { labelKey: 'NAV.DASHBOARD', icon: 'ti-home',  route: '/medical' },
+    { labelKey: 'NAV.PATIENTS',  icon: 'ti-users', route: '/medical/patients' },
   ],
   [UserRole.EMPLOYEE]: [
-    { label: 'Tableau de bord',  icon: 'ti-home',          route: '/employee' },
-    { label: 'Mes appels',       icon: 'ti-phone',         route: '/employee/calls' },
+    { labelKey: 'NAV.DASHBOARD', icon: 'ti-home',  route: '/employee' },
+    { labelKey: 'NAV.MY_CALLS', icon: 'ti-phone', route: '/employee/calls' },
   ],
   [UserRole.ADMIN]: [
-    { label: 'Tableau de bord',  icon: 'ti-home',          route: '/admin' },
-    { label: 'Utilisateurs',     icon: 'ti-users',         route: '/admin/users' },
-    { label: 'Campagnes',        icon: 'ti-speakerphone',  route: '/admin/campaigns' },
+    { labelKey: 'NAV.DASHBOARD',      icon: 'ti-home',         route: '/admin' },
+    { labelKey: 'NAV.USERS',          icon: 'ti-users',        route: '/admin/users' },
+    { labelKey: 'NAV.CAMPAIGNS',      icon: 'ti-speakerphone', route: '/admin/campaigns' },
   ],
   [UserRole.CEO]: [
-    { label: 'Tableau de bord',  icon: 'ti-home',          route: '/ceo' },
-    { label: 'Analytics',        icon: 'ti-chart-bar',     route: '/ceo/analytics' },
-    { label: 'Campagnes',        icon: 'ti-speakerphone',  route: '/ceo/campaigns' },
+    { labelKey: 'NAV.DASHBOARD', icon: 'ti-home',         route: '/ceo' },
+    { labelKey: 'NAV.ANALYTICS', icon: 'ti-chart-bar',    route: '/ceo/analytics' },
+    { labelKey: 'NAV.CAMPAIGNS', icon: 'ti-speakerphone', route: '/ceo/campaigns' },
   ],
 };
 
 @Component({
   selector: 'pp-sidebar',
-  imports: [RouterLink, RouterLinkActive, NgClass],
+  imports: [RouterLink, RouterLinkActive, NgClass, TranslateModule],
   template: `
-    <!-- ─── Overlay mobile (< 768px) ─────────────────────────── -->
+    <!-- Overlay mobile -->
     @if (mobileOpen()) {
       <div
         class="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
@@ -57,7 +59,6 @@ const NAV_ITEMS: Record<UserRole, NavItem[]> = {
       ></div>
     }
 
-    <!-- ─── Sidebar panel ─────────────────────────────────────── -->
     <aside
       class="fixed top-0 left-0 z-40 h-full flex flex-col bg-surface border-r border-border
              transition-all duration-300 ease-in-out"
@@ -100,18 +101,16 @@ const NAV_ITEMS: Record<UserRole, NavItem[]> = {
                   [class]="'ti ' + item.icon + ' text-lg flex-shrink-0'"
                   aria-hidden="true"
                 ></i>
-
                 @if (expanded() || mobileOpen()) {
-                  <span class="truncate whitespace-nowrap">{{ item.label }}</span>
+                  <span class="truncate whitespace-nowrap">{{ item.labelKey | translate }}</span>
                 } @else {
-                  <!-- Tooltip collapsed (md+) -->
                   <span
                     class="absolute left-14 bg-gray-900 dark:bg-gray-700 text-white text-xs
                            rounded-md px-2 py-1 whitespace-nowrap opacity-0 pointer-events-none
                            group-hover:opacity-100 transition-opacity duration-150 z-50"
                     role="tooltip"
                   >
-                    {{ item.label }}
+                    {{ item.labelKey | translate }}
                   </span>
                 }
               </a>
@@ -120,7 +119,7 @@ const NAV_ITEMS: Record<UserRole, NavItem[]> = {
         </ul>
       </nav>
 
-      <!-- Footer sidebar : toggle collapse (md+) -->
+      <!-- Collapse toggle (md+) -->
       <div class="border-t border-border p-2 flex-shrink-0 hidden md:flex">
         <button
           type="button"
@@ -128,7 +127,7 @@ const NAV_ITEMS: Record<UserRole, NavItem[]> = {
           class="w-full flex items-center justify-center p-2 rounded-lg text-muted
                  hover:bg-surface-2 hover:text-gray-900 dark:hover:text-gray-100
                  transition-colors"
-          [attr.aria-label]="expanded() ? 'Réduire la sidebar' : 'Agrandir la sidebar'"
+          [attr.aria-label]="(expanded() ? 'SHARED.SIDEBAR.COLLAPSE' : 'SHARED.SIDEBAR.EXPAND') | translate"
         >
           <i
             [class]="(expanded() ? 'ti-layout-sidebar-left-collapse' : 'ti-layout-sidebar-left-expand') + ' ti text-lg'"

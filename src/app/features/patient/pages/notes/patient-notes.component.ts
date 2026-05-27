@@ -18,15 +18,17 @@ import { Appointment } from '../../../../core/models/appointment.model';
 import { BadgeComponent } from '../../../../shared/components/badge/badge.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { CreateNoteModalComponent } from '../../modals/create-note-modal.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'pp-patient-notes',
-  imports: [DatePipe, FormsModule, BadgeComponent, EmptyStateComponent, CreateNoteModalComponent],
+  imports: [DatePipe, FormsModule, BadgeComponent, EmptyStateComponent, CreateNoteModalComponent, TranslateModule],
   templateUrl: './patient-notes.component.html',
 })
 export class PatientNotesComponent {
   private readonly auth        = inject(AuthService);
   private readonly noteService = inject(PatientNoteService);
+  private readonly translate = inject(TranslateService);
 
   readonly patientId = computed(() => this.auth.currentUser()?.id ?? '');
   private readonly ready = computed(() => !!this.patientId());
@@ -43,6 +45,14 @@ export class PatientNotesComponent {
       url: `${environment.apiUrl}/patients/${this.patientId()}/notes`,
       params,
     };
+  });
+
+  // Ajoute ce computed :
+  readonly notesCountLabel = computed(() => {
+    const n = this.notes().length;
+    return n <= 1
+      ? this.translate.instant('PATIENT.NOTES.COUNT_SINGULAR', { count: n })
+      : this.translate.instant('PATIENT.NOTES.COUNT_PLURAL', { count: n });
   });
 
   readonly notes = computed(() => {
@@ -96,18 +106,16 @@ export class PatientNotesComponent {
 
   // ─── Helper affichage temps relatif ──────────────────────────────────────
   timeAgo(dateVal: string | Date | null | undefined): string {
-    if (!dateVal) return '—';
+    if (!dateVal) return '';
     const date = typeof dateVal === 'string' ? new Date(dateVal) : dateVal;
-    if (isNaN(date.getTime())) return '—';
-
+    if (isNaN(date.getTime())) return '';
     const diff  = Date.now() - date.getTime();
     const mins  = Math.floor(diff / 60_000);
     const hours = Math.floor(diff / 3_600_000);
     const days  = Math.floor(diff / 86_400_000);
-
-    if (mins  <  1) return 'à l\'instant';
-    if (mins  < 60) return `il y a ${mins} min`;
-    if (hours < 24) return `il y a ${hours}h`;
-    return `il y a ${days} j`;
+    if (mins  <  1) return this.translate.instant('PATIENT.NOTES.TIME_NOW');
+    if (mins  < 60) return this.translate.instant('PATIENT.NOTES.TIME_MINS', { mins });
+    if (hours < 24) return this.translate.instant('PATIENT.NOTES.TIME_HOURS', { hours });
+    return this.translate.instant('PATIENT.NOTES.TIME_DAYS', { days });
   }
 }

@@ -1,18 +1,13 @@
+// src/app/features/employee/pages/call-history/call-history.component.ts
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LabelPipe } from '../../../../core/pipes/label.pipe';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { CallService } from '../../services/call.service';
 import { OfflineCallService } from '../../services/offline-call.service';
 import { Call, CallOutcome } from '../../../../core/models/call.model';
-
-const OUTCOME_LABEL: Record<CallOutcome, string> = {
-  REACHED:            'Contact abouti',
-  NO_ANSWER:          'Pas de réponse',
-  BUSY:               'Occupé',
-  WRONG_NUMBER:       'Mauvais numéro',
-  CALLBACK_REQUESTED: 'Rappel demandé',
-};
 
 const OUTCOME_STYLE: Record<CallOutcome, string> = {
   REACHED:            'bg-green-50 text-success',
@@ -25,13 +20,14 @@ const OUTCOME_STYLE: Record<CallOutcome, string> = {
 @Component({
   selector: 'pp-call-history',
   standalone: true,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, TranslateModule, LabelPipe],
   templateUrl: './call-history.component.html',
 })
 export class CallHistoryComponent implements OnInit {
   private readonly auth           = inject(AuthService);
   private readonly callService    = inject(CallService);
   private readonly offlineService = inject(OfflineCallService);
+  private readonly translate      = inject(TranslateService);
 
   readonly calls        = signal<Call[]>([]);
   readonly isLoading    = signal(true);
@@ -39,10 +35,16 @@ export class CallHistoryComponent implements OnInit {
   readonly total        = signal(0);
   readonly limit        = 20;
   readonly pendingCount = this.offlineService.pendingCount;
+  readonly totalPages   = computed(() => Math.ceil(this.total() / this.limit));
 
-  readonly totalPages = computed(() => Math.ceil(this.total() / this.limit));
+  readonly totalLabel = computed(() => {
+    const t = this.total();
+    const key = t <= 1
+      ? 'EMPLOYEE.CALL_HISTORY.SUBTITLE_SINGULAR'
+      : 'EMPLOYEE.CALL_HISTORY.SUBTITLE_PLURAL';
+    return this.translate.instant(key, { total: t });
+  });
 
-  readonly outcomeLabel = (o: CallOutcome) => OUTCOME_LABEL[o] ?? o;
   readonly outcomeStyle = (o: CallOutcome) => OUTCOME_STYLE[o] ?? 'bg-gray-100 text-muted';
 
   async ngOnInit(): Promise<void> {
@@ -57,7 +59,6 @@ export class CallHistoryComponent implements OnInit {
   private async loadCalls(): Promise<void> {
     const employeeId = this.auth.currentUser()?.id;
     if (!employeeId) return;
-
     this.isLoading.set(true);
     try {
       const res = await this.callService

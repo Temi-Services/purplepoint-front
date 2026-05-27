@@ -1,11 +1,9 @@
 <div class="max-w-3xl mx-auto px-4 py-8">
-
   <div class="mb-6">
-    <h1 class="text-2xl font-semibold text-gray-900">Mes rendez-vous</h1>
-    <p class="text-sm text-muted mt-1">Historique et rendez-vous à venir</p>
+    <h1 class="text-2xl font-semibold text-gray-900">{{ 'PATIENT.APPOINTMENTS.TITLE' | translate }}</h1>
+    <p class="text-sm text-muted mt-1">{{ 'PATIENT.APPOINTMENTS.SUBTITLE' | translate }}</p>
   </div>
 
-  <!-- Tabs -->
   <div class="border-b border-border mb-6">
     <nav class="flex gap-1 -mb-px">
       @for (tab of tabs; track tab.key) {
@@ -16,7 +14,7 @@
             ? 'border-primary text-primary'
             : 'border-transparent text-muted hover:text-gray-900'"
         >
-          {{ tab.label }}
+          {{ tab.labelKey | translate }}
         </button>
       }
     </nav>
@@ -33,7 +31,7 @@
     @if (filtered().length === 0) {
       <div class="bg-surface rounded-lg border border-border px-6 py-12 text-center">
         <p class="text-sm text-muted">
-          Aucun rendez-vous {{ activeTab() === 'upcoming' ? 'à venir' : 'passé' }}.
+          {{ (activeTab() === 'upcoming' ? 'PATIENT.APPOINTMENTS.EMPTY_UPCOMING' : 'PATIENT.APPOINTMENTS.EMPTY_PAST') | translate }}
         </p>
       </div>
     } @else {
@@ -44,5 +42,4 @@
       </div>
     }
   }
-
 </div>

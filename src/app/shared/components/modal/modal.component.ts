@@ -1,11 +1,15 @@
+// src/app/shared/components/modal/modal.component.ts
 import {
   Component,
   input,
   output,
   computed,
   HostListener,
+  inject,
+  OnInit,
 } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 const SIZE_CLASSES = {
   sm:   'max-w-sm',
@@ -17,14 +21,12 @@ const SIZE_CLASSES = {
 
 @Component({
   selector: 'pp-modal',
-  imports: [NgClass],
+  imports: [NgClass, TranslateModule],
   template: `
-    <!-- Overlay -->
     <div
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       (click)="onOverlayClick($event)"
     >
-      <!-- Panel -->
       <div
         class="bg-surface rounded-2xl w-full flex flex-col shadow-xl"
         [ngClass]="sizeClass()"
@@ -40,7 +42,7 @@ const SIZE_CLASSES = {
             (click)="closed.emit()"
             class="p-1.5 rounded-lg text-muted hover:bg-surface-2 hover:text-gray-900
                    dark:hover:text-gray-100 transition-colors"
-            aria-label="Fermer"
+            [attr.aria-label]="'SHARED.MODAL.CLOSE' | translate"
           >
             <i class="ti ti-x text-lg" aria-hidden="true"></i>
           </button>
@@ -53,10 +55,8 @@ const SIZE_CLASSES = {
 
         <!-- Footer -->
         @if (showFooter()) {
-          <!-- Slot custom : <div modal-footer>…</div> -->
           <ng-content select="[modal-footer]" />
 
-          <!-- Footer par défaut si pas de slot custom -->
           <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-border flex-shrink-0">
             <button
               type="button"
@@ -64,8 +64,9 @@ const SIZE_CLASSES = {
               class="px-4 py-2 text-sm font-medium rounded-lg border border-border
                      text-gray-700 dark:text-gray-300 hover:bg-surface-2 transition-colors"
             >
-              {{ cancelLabel() }}
+              {{ cancelLabel() || ('SHARED.MODAL.CANCEL' | translate) }}
             </button>
+
             <button
               type="button"
               (click)="submitted.emit()"
@@ -82,7 +83,7 @@ const SIZE_CLASSES = {
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                 </svg>
               }
-              {{ submitLabel() }}
+              {{ submitLabel() || ('SHARED.MODAL.CONFIRM' | translate) }}
             </button>
           </div>
         }
@@ -94,8 +95,8 @@ export class ModalComponent {
   readonly title          = input<string>('');
   readonly size           = input<'sm' | 'md' | 'lg' | 'xl' | 'full'>('md');
   readonly showFooter     = input<boolean>(true);
-  readonly submitLabel    = input<string>('Confirmer');
-  readonly cancelLabel    = input<string>('Annuler');
+  readonly submitLabel    = input<string>('');
+  readonly cancelLabel    = input<string>('');
   readonly submitDisabled = input<boolean>(false);
   readonly loading        = input<boolean>(false);
 

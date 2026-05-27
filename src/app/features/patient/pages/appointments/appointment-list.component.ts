@@ -6,10 +6,11 @@ import { AppointmentService } from '../../services/appointment.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { Appointment } from '../../../../core/models/appointment.model';
 import { AppointmentCardComponent } from '../../components/appointment-card/appointment-card.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'pp-appointment-list',
-  imports: [AppointmentCardComponent],
+  imports: [AppointmentCardComponent, TranslateModule],
   templateUrl: './appointment-list.component.html',
 })
 export class AppointmentListComponent implements OnInit {
@@ -20,9 +21,9 @@ export class AppointmentListComponent implements OnInit {
   readonly isLoading    = signal(true);
   readonly activeTab    = signal<'upcoming' | 'past'>('upcoming');
 
-  readonly tabs: { key: 'upcoming' | 'past'; label: string }[] = [
-    { key: 'upcoming', label: 'À venir' },
-    { key: 'past',     label: 'Passés'  },
+  readonly tabs: { key: 'upcoming' | 'past'; labelKey: string }[] = [
+    { key: 'upcoming', labelKey: 'PATIENT.APPOINTMENTS.TAB_UPCOMING' },
+    { key: 'past',     labelKey: 'PATIENT.APPOINTMENTS.TAB_PAST' },
   ];
 
   readonly filtered = computed(() => {

@@ -1,6 +1,7 @@
 // src/app/features/employee/modals/call-log-form-modal.component.ts
 import { Component, output, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { CallService } from '../services/call.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -8,31 +9,31 @@ import { CallOutcome } from '../../../core/models/call.model';
 import { PatientSearchComponent } from '../../../shared/components/patient-search/patient-search.component';
 import { User } from '../../../core/models/user.model';
 
-const OUTCOMES: { value: CallOutcome; label: string }[] = [
-  { value: 'REACHED',            label: 'Contact abouti'  },
-  { value: 'NO_ANSWER',          label: 'Pas de réponse'  },
-  { value: 'BUSY',               label: 'Occupé'          },
-  { value: 'WRONG_NUMBER',       label: 'Mauvais numéro'  },
-  { value: 'CALLBACK_REQUESTED', label: 'Rappel demandé'  },
-];
-
 @Component({
   selector: 'pp-call-log-form-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, ModalComponent, PatientSearchComponent],
+  imports: [ReactiveFormsModule, ModalComponent, PatientSearchComponent, TranslateModule],
   templateUrl: './call-log-form-modal.component.html',
 })
 export class CallLogFormModalComponent {
-  private readonly fb      = inject(FormBuilder);
-  private readonly service = inject(CallService);
-  private readonly auth    = inject(AuthService);
+  private readonly fb        = inject(FormBuilder);
+  private readonly service   = inject(CallService);
+  private readonly auth      = inject(AuthService);
+  private readonly translate = inject(TranslateService);
 
   readonly saved  = output<void>();
   readonly closed = output<void>();
 
   readonly isLoading = signal(false);
   readonly error     = signal<string | null>(null);
-  readonly outcomes  = OUTCOMES;
+
+  readonly outcomes: { value: CallOutcome; labelKey: string }[] = [
+    { value: 'REACHED',            labelKey: 'LABELS.CALL_OUTCOME.REACHED' },
+    { value: 'NO_ANSWER',          labelKey: 'LABELS.CALL_OUTCOME.NO_ANSWER' },
+    { value: 'BUSY',               labelKey: 'LABELS.CALL_OUTCOME.BUSY' },
+    { value: 'WRONG_NUMBER',       labelKey: 'LABELS.CALL_OUTCOME.WRONG_NUMBER' },
+    { value: 'CALLBACK_REQUESTED', labelKey: 'LABELS.CALL_OUTCOME.CALLBACK_REQUESTED' },
+  ];
 
   readonly form = this.fb.nonNullable.group({
     patientId: ['', Validators.required],
@@ -60,7 +61,7 @@ export class CallLogFormModalComponent {
       this.saved.emit();
       this.closed.emit();
     } catch {
-      this.error.set('Une erreur est survenue. Veuillez réessayer.');
+      this.error.set(this.translate.instant('EMPLOYEE.CALL_LOG_MODAL.ERROR_GENERIC'));
     } finally {
       this.isLoading.set(false);
     }

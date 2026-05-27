@@ -7,6 +7,7 @@ import { MedicalRecordService, CreateMedicalRecordDto } from '../../services/med
 import { AuthService } from '../../../../core/auth/auth.service';
 import { MedicalRecord, BloodType } from '../../../../core/models/medical-record.model';
 import { TagInputComponent } from '../../../../shared/components/tag-input/tag-input.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 const BLOOD_TYPE_LABEL: Record<BloodType, string> = {
   A_POSITIVE:  'A+',
@@ -31,7 +32,7 @@ const BLOOD_TYPES: BloodType[] = [
 @Component({
   selector: 'pp-medical-record-view',
   standalone: true,
-  imports: [FormsModule, DatePipe, TagInputComponent],
+  imports: [FormsModule, DatePipe, TagInputComponent, TranslateModule],
   templateUrl: './medical-record-view.component.html',
 })
 export class MedicalRecordViewComponent implements OnInit {

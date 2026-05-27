@@ -1,3 +1,4 @@
+<!-- src/app/shared/components/navbar/navbar.component.html -->
 <header class="fixed top-0 inset-x-0 z-50 h-16 bg-surface border-b border-border">
   <div class="max-w-7xl mx-auto h-full px-4 flex items-center justify-between gap-6">
 
@@ -16,8 +17,8 @@
           [routerLink]="item.route"
           routerLinkActive="bg-primary-light text-primary font-medium"
           class="px-3 py-1.5 rounded-md text-sm text-muted hover:bg-surface-2 hover:text-gray-900 transition-colors"
-          >
-          {{ item.label }}
+        >
+          {{ item.labelKey | translate }}
         </a>
       }
     </nav>
@@ -34,7 +35,7 @@
         (click)="logout()"
         class="text-xs text-muted hover:text-gray-900 px-2 py-1 rounded transition-colors"
       >
-        Déconnexion
+        {{ 'SHARED.NAVBAR.LOGOUT' | translate }}
       </button>
     </div>
 

@@ -1,18 +1,20 @@
-import { Component, inject, signal } from '@angular/core';
+// src/app/features/employee/pages/call-log-form/call-log-form.component.ts
+import { Component, inject, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { OfflineCallService } from '../../services/offline-call.service';
 import { UserService } from '../../../medical/services/user.service';
 import { User } from '../../../../core/models/user.model';
 import { CallOutcome } from '../../../../core/models/call.model';
-import { FormsModule } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'pp-call-log-form',
   standalone: true,
-  imports: [ReactiveFormsModule, FormsModule],
+  imports: [ReactiveFormsModule, FormsModule, TranslateModule],
   templateUrl: './call-log-form.component.html',
 })
 export class CallLogFormComponent {
@@ -21,6 +23,7 @@ export class CallLogFormComponent {
   private readonly auth           = inject(AuthService);
   private readonly offlineService = inject(OfflineCallService);
   private readonly userService    = inject(UserService);
+  private readonly translate      = inject(TranslateService);
 
   readonly isLoading    = signal(false);
   readonly isOnline     = signal(navigator.onLine);
@@ -30,12 +33,12 @@ export class CallLogFormComponent {
   readonly isSearching  = signal(false);
   readonly startTime    = Date.now();
 
-  readonly outcomes: { value: CallOutcome; label: string }[] = [
-    { value: 'REACHED',            label: 'Contact abouti'         },
-    { value: 'NO_ANSWER',          label: 'Pas de réponse'         },
-    { value: 'BUSY',               label: 'Occupé'                 },
-    { value: 'WRONG_NUMBER',       label: 'Mauvais numéro'         },
-    { value: 'CALLBACK_REQUESTED', label: 'Rappel demandé'         },
+  readonly outcomes: { value: CallOutcome; labelKey: string }[] = [
+    { value: 'REACHED',            labelKey: 'LABELS.CALL_OUTCOME.REACHED' },
+    { value: 'NO_ANSWER',          labelKey: 'LABELS.CALL_OUTCOME.NO_ANSWER' },
+    { value: 'BUSY',               labelKey: 'LABELS.CALL_OUTCOME.BUSY' },
+    { value: 'WRONG_NUMBER',       labelKey: 'LABELS.CALL_OUTCOME.WRONG_NUMBER' },
+    { value: 'CALLBACK_REQUESTED', labelKey: 'LABELS.CALL_OUTCOME.CALLBACK_REQUESTED' },
   ];
 
   readonly form = this.fb.nonNullable.group({
@@ -45,18 +48,22 @@ export class CallLogFormComponent {
     notes:     [''],
   });
 
-  // call-log-form.component.ts
+  readonly submitLabel = computed(() => {
+    if (this.isLoading()) return 'EMPLOYEE.CALL_LOG_FORM.SUBMIT_LOADING';
+    return this.isOnline()
+      ? 'EMPLOYEE.CALL_LOG_FORM.SUBMIT_ONLINE'
+      : 'EMPLOYEE.CALL_LOG_FORM.SUBMIT_OFFLINE';
+  });
+
   async searchPatients(query: string): Promise<void> {
     this.patientQuery.set(query);
     if (query.length < 2) {
       this.patients.set([]);
       return;
     }
-
     this.isSearching.set(true);
     try {
       const res = await firstValueFrom(this.userService.getPatients(1, 10));
-      // ✅ Correction : res.data.data au lieu de res.data
       const patientsList = res?.data?.data ?? [];
       const q = query.toLowerCase();
       this.patients.set(
@@ -64,8 +71,7 @@ export class CallLogFormComponent {
           `${p.firstName} ${p.lastName}`.toLowerCase().includes(q)
         )
       );
-    } catch (error) {
-      console.error('Error searching patients:', error);
+    } catch {
       this.patients.set([]);
     } finally {
       this.isSearching.set(false);
@@ -82,10 +88,8 @@ export class CallLogFormComponent {
     if (this.form.invalid) return;
     this.isLoading.set(true);
     this.error.set(null);
-
     const elapsed = Math.round((Date.now() - this.startTime) / 1000);
     const { patientId, outcome, duration, notes } = this.form.getRawValue();
-
     try {
       await this.offlineService.submit({
         employeeId: this.auth.currentUser()!.id,
@@ -95,10 +99,9 @@ export class CallLogFormComponent {
         notes:      notes || undefined,
         calledAt:   new Date().toISOString(),
       });
-
       this.router.navigate(['/employee/dashboard']);
     } catch {
-      this.error.set('Erreur lors de l\'enregistrement. Réessayez.');
+      this.error.set(this.translate.instant('EMPLOYEE.CALL_LOG_FORM.ERROR_SAVE'));
     } finally {
       this.isLoading.set(false);
     }

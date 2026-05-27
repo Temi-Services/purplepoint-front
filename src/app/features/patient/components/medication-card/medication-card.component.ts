@@ -3,6 +3,8 @@ import { Component, input, output, inject, signal, OnInit, computed } from '@ang
 import { Medication } from '../../../../core/models/medication.model';
 import { MedicationService } from '../../services/medication.service';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LabelPipe } from '../../../../core/pipes/label.pipe';
 
 const FREQUENCY_LABEL: Record<string, string> = {
   ONCE_DAILY:        '1× par jour',
@@ -25,11 +27,13 @@ function isSameDay(date: string | Date): boolean {
 @Component({
   selector: 'pp-medication-card',
   standalone: true,
-  imports: [ConfirmDialogComponent],
+  imports: [ConfirmDialogComponent, TranslateModule, LabelPipe],
   templateUrl: './medication-card.component.html',
 })
 export class MedicationCardComponent implements OnInit {
+
   private readonly medService = inject(MedicationService);
+  private readonly translate = inject(TranslateService);
 
   readonly medication = input.required<Medication>();
   readonly taken      = output<string>();
@@ -39,6 +43,13 @@ export class MedicationCardComponent implements OnInit {
   readonly showConfirm = signal(false);
   readonly isLoading   = signal(false);
   readonly takenToday  = signal(false);
+
+  readonly confirmMessage = computed(() =>
+    this.translate.instant('PATIENT.MED_CARD.CONFIRM_MESSAGE', {
+      name:   this.medication().name,
+      dosage: this.medication().dosage,
+    })
+  );
 
   ngOnInit(): void {
     const alreadyTaken = this.medication().intakes?.some(
@@ -66,7 +77,9 @@ export class MedicationCardComponent implements OnInit {
         status:      'TAKEN',
         scheduledAt: now.toISOString(),
         takenAt:     now.toISOString(),
-        note:        `Pris le ${dateStr}`,
+        note: this.translate.instant('PATIENT.MED_CARD.INTAKE_NOTE', {
+          date: now.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }),
+        }),
       }).toPromise();
       this.takenToday.set(true);
       this.taken.emit(med.id);

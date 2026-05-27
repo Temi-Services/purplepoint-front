@@ -1,19 +1,20 @@
+<!-- src/app/features/employee/pages/call-history/call-history.component.html -->
 <div class="max-w-4xl mx-auto px-4 py-8">
 
-  <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-semibold text-gray-900">Historique des appels</h1>
-      <p class="text-sm text-muted mt-1">{{ total() }} appels enregistrés</p>
+      <h1 class="text-2xl font-semibold text-gray-900">
+        {{ 'EMPLOYEE.CALL_HISTORY.TITLE' | translate }}
+      </h1>
+      <p class="text-sm text-muted mt-1">{{ totalLabel() }}</p>
     </div>
     <a routerLink="../calls/new"
        class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md
               hover:bg-primary-hover transition-colors">
-      + Nouvel appel
+      {{ 'EMPLOYEE.CALL_HISTORY.NEW_CALL' | translate }}
     </a>
   </div>
 
-  <!-- Pending sync banner -->
   @if (pendingCount() > 0) {
     <div class="mb-6 px-4 py-3 rounded-md bg-amber-50 border border-amber-200 text-sm text-warning
                 flex items-center gap-2">
@@ -21,7 +22,7 @@
            stroke="currentColor" stroke-width="2">
         <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
       </svg>
-      {{ pendingCount() }} appel(s) locaux en attente de synchronisation
+      {{ 'EMPLOYEE.CALL_HISTORY.PENDING_SYNC' | translate : { count: pendingCount() } }}
     </div>
   }
 
@@ -33,16 +34,25 @@
       </svg>
     </div>
   } @else {
-
     <div class="bg-surface rounded-lg border border-border overflow-hidden">
       <table class="w-full text-sm">
         <thead>
         <tr class="border-b border-border bg-surface-2">
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">Patient</th>
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden sm:table-cell">Date</th>
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden md:table-cell">Durée</th>
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">Résultat</th>
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden lg:table-cell">Notes</th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">
+            {{ 'EMPLOYEE.CALL_HISTORY.COL_PATIENT' | translate }}
+          </th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden sm:table-cell">
+            {{ 'EMPLOYEE.CALL_HISTORY.COL_DATE' | translate }}
+          </th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden md:table-cell">
+            {{ 'EMPLOYEE.CALL_HISTORY.COL_DURATION' | translate }}
+          </th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">
+            {{ 'EMPLOYEE.CALL_HISTORY.COL_OUTCOME' | translate }}
+          </th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden lg:table-cell">
+            {{ 'EMPLOYEE.CALL_HISTORY.COL_NOTES' | translate }}
+          </th>
         </tr>
         </thead>
         <tbody>
@@ -52,7 +62,7 @@
                 {{ call.patientName ?? call.patientId }}
               </td>
               <td class="px-4 py-3 text-muted hidden sm:table-cell">
-                {{ call.calledAt | date:'d MMM yyyy, HH:mm' : '' : 'fr' }}
+                {{ call.calledAt | date:'d MMM yyyy, HH:mm' }}
               </td>
               <td class="px-4 py-3 text-muted hidden md:table-cell">
                 {{ call.duration ? call.duration + 's' : '—' }}
@@ -60,7 +70,7 @@
               <td class="px-4 py-3">
                 <span class="text-xs font-medium px-2 py-0.5 rounded-full"
                       [class]="outcomeStyle(call.outcome)">
-                  {{ outcomeLabel(call.outcome) }}
+                  {{ call.outcome | ppLabel:'callOutcome' }}
                 </span>
               </td>
               <td class="px-4 py-3 text-muted text-xs hidden lg:table-cell max-w-xs truncate">
@@ -70,7 +80,7 @@
           } @empty {
             <tr>
               <td colspan="5" class="px-4 py-12 text-center text-sm text-muted">
-                Aucun appel enregistré.
+                {{ 'EMPLOYEE.CALL_HISTORY.EMPTY' | translate }}
               </td>
             </tr>
           }
@@ -78,10 +88,11 @@
       </table>
     </div>
 
-    <!-- Pagination -->
     @if (totalPages() > 1) {
       <div class="flex items-center justify-between mt-4">
-        <p class="text-xs text-muted">Page {{ page() }} sur {{ totalPages() }}</p>
+        <p class="text-xs text-muted">
+          {{ 'EMPLOYEE.CALL_HISTORY.PAGE_INFO' | translate : { page: page(), total: totalPages() } }}
+        </p>
         <div class="flex gap-2">
           <button
             (click)="goToPage(page() - 1)"
@@ -89,7 +100,7 @@
             class="px-3 py-1.5 text-xs rounded-md border border-border
                    hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Précédent
+            {{ 'EMPLOYEE.CALL_HISTORY.PREV' | translate }}
           </button>
           <button
             (click)="goToPage(page() + 1)"
@@ -97,11 +108,10 @@
             class="px-3 py-1.5 text-xs rounded-md border border-border
                    hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Suivant
+            {{ 'EMPLOYEE.CALL_HISTORY.NEXT' | translate }}
           </button>
         </div>
       </div>
     }
-
   }
 </div>

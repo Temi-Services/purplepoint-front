@@ -1,7 +1,7 @@
 <!-- src/app/shared/components/patient-search/patient-search.component.html -->
 <div class="relative">
   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-    Patient <span class="text-danger">*</span>
+    {{ 'SHARED.PATIENT_SEARCH.LABEL' | translate }} <span class="text-danger">*</span>
   </label>
 
   <div class="relative">
@@ -30,7 +30,7 @@
         type="button"
         (click)="clear()"
         class="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
-        title="Effacer"
+        [title]="'SHARED.PATIENT_SEARCH.CLEAR' | translate"
       >
         <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm2.707-9.707a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293z" clip-rule="evenodd" />
@@ -41,7 +41,6 @@
 
   @if (showDropdown() && (results().length > 0 || (query().length >= 2 && !isSearching()))) {
     <div class="absolute z-50 w-full mt-1 bg-surface border border-border rounded-lg shadow-lg overflow-hidden">
-
       @if (results().length > 0) {
         @for (patient of results(); track patient.id) {
           <button
@@ -63,13 +62,13 @@
         }
       } @else {
         <div class="px-3 py-4 text-sm text-center text-muted">
-          Aucun patient trouvé pour « {{ query() }} »
+          {{ 'SHARED.PATIENT_SEARCH.NO_RESULTS' | translate : { query: query() } }}
         </div>
       }
     </div>
   }
 
   @if (touched() && !selectedPatient()) {
-    <p class="mt-1 text-xs text-danger">Veuillez sélectionner un patient.</p>
+    <p class="mt-1 text-xs text-danger">{{ 'SHARED.PATIENT_SEARCH.REQUIRED' | translate }}</p>
   }
 </div>

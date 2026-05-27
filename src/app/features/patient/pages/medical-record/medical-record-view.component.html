@@ -1,28 +1,23 @@
-<!-- src/app/features/patient/pages/medical-record/medical-record-view.component.html -->
 <div class="max-w-3xl mx-auto px-4 py-8">
-
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Mon dossier médical</h1>
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        {{ 'PATIENT.MEDICAL_RECORD.TITLE' | translate }}
+      </h1>
       <p class="text-sm text-muted mt-1">
-        {{ mode() === 'create' ? 'Complétez vos informations médicales' : 'Vos informations de santé' }}
+        {{ (mode() === 'create' ? 'PATIENT.MEDICAL_RECORD.SUBTITLE_CREATE' : 'PATIENT.MEDICAL_RECORD.SUBTITLE_VIEW') | translate }}
       </p>
     </div>
     @if (mode() === 'view' && record()) {
-      <button
-        type="button"
-        (click)="startEdit()"
-        class="btn-secondary flex items-center gap-2 text-sm"
-      >
+      <button type="button" (click)="startEdit()" class="btn-secondary flex items-center gap-2 text-sm">
         <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
         </svg>
-        Modifier
+        {{ 'PATIENT.MEDICAL_RECORD.EDIT' | translate }}
       </button>
     }
   </div>
 
-  <!-- Feedback -->
   @if (success()) {
     <div class="mb-4 px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-sm text-success flex items-center gap-2">
       <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
@@ -31,13 +26,13 @@
       {{ success() }}
     </div>
   }
+
   @if (error()) {
     <div class="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-danger">
       {{ error() }}
     </div>
   }
 
-  <!-- Loading -->
   @if (isLoading()) {
     <div class="flex justify-center py-24">
       <svg class="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
@@ -46,14 +41,14 @@
       </svg>
     </div>
 
-    <!-- MODE VUE -->
   } @else if (mode() === 'view' && record()) {
     <div class="space-y-4">
 
-      <!-- Groupe sanguin -->
       <div class="bg-surface rounded-xl border border-border p-6 flex items-center justify-between">
         <div>
-          <p class="text-xs font-medium text-muted uppercase tracking-wide mb-1">Groupe sanguin</p>
+          <p class="text-xs font-medium text-muted uppercase tracking-wide mb-1">
+            {{ 'PATIENT.MEDICAL_RECORD.BLOOD_TYPE' | translate }}
+          </p>
           <p class="text-4xl font-bold text-primary">{{ bloodTypeLabel(record()!.bloodType) }}</p>
         </div>
         <div class="w-14 h-14 rounded-full bg-primary-light flex items-center justify-center">
@@ -63,9 +58,10 @@
         </div>
       </div>
 
-      <!-- Allergies -->
       <div class="bg-surface rounded-xl border border-border p-6">
-        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Allergies</p>
+        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+          {{ 'PATIENT.MEDICAL_RECORD.ALLERGIES' | translate }}
+        </p>
         @if (record()!.allergies.length > 0) {
           <div class="flex flex-wrap gap-2">
             @for (a of record()!.allergies; track a) {
@@ -73,13 +69,14 @@
             }
           </div>
         } @else {
-          <p class="text-sm text-muted">Aucune allergie connue.</p>
+          <p class="text-sm text-muted">{{ 'PATIENT.MEDICAL_RECORD.NO_ALLERGIES' | translate }}</p>
         }
       </div>
 
-      <!-- Maladies chroniques -->
       <div class="bg-surface rounded-xl border border-border p-6">
-        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Maladies chroniques</p>
+        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+          {{ 'PATIENT.MEDICAL_RECORD.CHRONIC_DISEASES' | translate }}
+        </p>
         @if (record()!.chronicDiseases.length > 0) {
           <div class="flex flex-wrap gap-2">
             @for (d of record()!.chronicDiseases; track d) {
@@ -87,14 +84,15 @@
             }
           </div>
         } @else {
-          <p class="text-sm text-muted">Aucune maladie chronique renseignée.</p>
+          <p class="text-sm text-muted">{{ 'PATIENT.MEDICAL_RECORD.NO_CHRONIC' | translate }}</p>
         }
       </div>
 
-      <!-- Notes médicales -->
       @if (record()!.notes.length > 0) {
         <div class="bg-surface rounded-xl border border-border p-6">
-          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Notes médicales</p>
+          <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            {{ 'PATIENT.MEDICAL_RECORD.MEDICAL_NOTES' | translate }}
+          </p>
           <div class="space-y-3">
             @for (note of record()!.notes; track note.id) {
               <div class="border-l-2 border-primary pl-4 py-1">
@@ -107,24 +105,21 @@
       }
 
       <p class="text-xs text-muted text-right">
-        Dernière mise à jour : {{ record()!.updatedAt | date:'d MMMM yyyy' }}
+        {{ 'PATIENT.MEDICAL_RECORD.LAST_UPDATED' | translate }} {{ record()!.updatedAt | date:'d MMMM yyyy' }}
       </p>
     </div>
 
-    <!-- MODE FORMULAIRE (create ou edit) -->
   } @else {
     <div class="space-y-5">
-
       @if (mode() === 'create') {
         <div class="bg-primary-light border border-purple-200 rounded-xl px-5 py-4 text-sm text-primary">
-          Vous n'avez pas encore de dossier médical. Renseignez vos informations ci-dessous pour que l'équipe médicale puisse mieux vous suivre.
+          {{ 'PATIENT.MEDICAL_RECORD.CREATE_HINT' | translate }}
         </div>
       }
 
-      <!-- Groupe sanguin -->
       <div class="bg-surface rounded-xl border border-border p-6">
         <label class="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-          Groupe sanguin
+          {{ 'PATIENT.MEDICAL_RECORD.BLOOD_TYPE' | translate }}
         </label>
         <div class="grid grid-cols-3 sm:grid-cols-5 gap-2">
           @for (bt of bloodTypes; track bt) {
@@ -142,57 +137,44 @@
         </div>
       </div>
 
-      <!-- Allergies -->
       <div class="bg-surface rounded-xl border border-border p-6">
         <label class="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-          Allergies
-          <span class="font-normal text-muted ml-1">(optionnel)</span>
+          {{ 'PATIENT.MEDICAL_RECORD.ALLERGIES' | translate }}
+          <span class="font-normal text-muted ml-1">({{ 'SHARED.OPTIONAL' | translate }})</span>
         </label>
         <pp-tag-input
           [(tags)]="formAllergies"
-          placeholder="Ex : Pénicilline, Arachides…"
+          [placeholder]="'PATIENT.MEDICAL_RECORD.ALLERGIES_PLACEHOLDER' | translate"
           color="red"
         />
       </div>
 
-      <!-- Maladies chroniques -->
       <div class="bg-surface rounded-xl border border-border p-6">
         <label class="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
-          Maladies chroniques
-          <span class="font-normal text-muted ml-1">(optionnel)</span>
+          {{ 'PATIENT.MEDICAL_RECORD.CHRONIC_DISEASES' | translate }}
+          <span class="font-normal text-muted ml-1">({{ 'SHARED.OPTIONAL' | translate }})</span>
         </label>
         <pp-tag-input
           [(tags)]="formChronicDiseases"
-          placeholder="Ex : Diabète type 2, Hypertension…"
+          [placeholder]="'PATIENT.MEDICAL_RECORD.CHRONIC_PLACEHOLDER' | translate"
           color="purple"
         />
       </div>
 
-      <!-- Actions -->
       <div class="flex items-center justify-end gap-3 pt-2">
         @if (mode() === 'edit') {
-          <button
-            type="button"
-            (click)="cancelEdit()"
-            class="btn-secondary text-sm"
-            [disabled]="isSaving()"
-          >
-            Annuler
+          <button type="button" (click)="cancelEdit()" class="btn-secondary text-sm" [disabled]="isSaving()">
+            {{ 'SHARED.CANCEL' | translate }}
           </button>
         }
-        <button
-          type="button"
-          (click)="save()"
-          class="btn-primary text-sm flex items-center gap-2"
-          [disabled]="isSaving()"
-        >
+        <button type="button" (click)="save()" class="btn-primary text-sm flex items-center gap-2" [disabled]="isSaving()">
           @if (isSaving()) {
             <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
             </svg>
           }
-          {{ mode() === 'create' ? 'Créer mon dossier' : 'Enregistrer' }}
+          {{ (mode() === 'create' ? 'PATIENT.MEDICAL_RECORD.SAVE_CREATE' : 'PATIENT.MEDICAL_RECORD.SAVE_EDIT') | translate }}
         </button>
       </div>
     </div>
