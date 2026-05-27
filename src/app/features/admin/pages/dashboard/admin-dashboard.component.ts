@@ -1,13 +1,8 @@
-import {
-  Component,
-  inject,
-  signal,
-  computed,
-  TemplateRef,
-  viewChild,
-} from '@angular/core';
+// src/app/features/admin/pages/dashboard/admin-dashboard.component.ts
+import { Component, inject, signal, computed, TemplateRef, viewChild } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ApiResponse, PaginatedData } from '../../../../core/http/api-types';
@@ -22,64 +17,55 @@ import { UserFormModalComponent } from '../../modals/user-form-modal.component';
 @Component({
   selector: 'pp-admin-dashboard',
   imports: [
-    RouterLink,
-    WelcomeCardComponent,
-    StatCardComponent,
-    DataTableComponent,
-    BadgeComponent,
-    UserFormModalComponent,
+    RouterLink, TranslateModule,
+    WelcomeCardComponent, StatCardComponent,
+    DataTableComponent, BadgeComponent, UserFormModalComponent,
   ],
   templateUrl: './admin-dashboard.component.html',
 })
 export class AdminDashboardComponent {
-  private readonly auth = inject(AuthService);
+  private readonly auth      = inject(AuthService);
+  private readonly translate = inject(TranslateService);
 
   readonly userName = computed(() => this.auth.currentUser()?.firstName ?? '');
 
-  // ─── Stats via httpResource parallèles ────────────────────────────────────
-  readonly allUsersRes = httpResource<ApiResponse<PaginatedData<User>>>(() => ({
+  readonly allUsersRes   = httpResource<ApiResponse<PaginatedData<User>>>(() => ({
     url: `${environment.apiUrl}/users`, params: { page: '1', limit: '1' },
   }));
-  readonly patientsRes = httpResource<ApiResponse<PaginatedData<User>>>(() => ({
+  readonly patientsRes   = httpResource<ApiResponse<PaginatedData<User>>>(() => ({
     url: `${environment.apiUrl}/users`, params: { page: '1', limit: '1', role: UserRole.PATIENT },
   }));
-  readonly employeesRes = httpResource<ApiResponse<PaginatedData<User>>>(() => ({
+  readonly employeesRes  = httpResource<ApiResponse<PaginatedData<User>>>(() => ({
     url: `${environment.apiUrl}/users`, params: { page: '1', limit: '1', role: UserRole.EMPLOYEE },
   }));
-  readonly campaignsRes = httpResource<ApiResponse<PaginatedData<unknown>>>(() => ({
+  readonly campaignsRes  = httpResource<ApiResponse<PaginatedData<unknown>>>(() => ({
     url: `${environment.apiUrl}/campaigns`, params: { page: '1', limit: '1' },
   }));
-
-  // ─── Derniers utilisateurs (5 lignes) ─────────────────────────────────────
   readonly recentUsersRes = httpResource<ApiResponse<PaginatedData<User>>>(() => ({
     url: `${environment.apiUrl}/users`, params: { page: '1', limit: '5' },
   }));
 
-  readonly totalUsers     = computed(() => this.allUsersRes.value()?.data?.total    ?? 0);
-  readonly totalPatients  = computed(() => this.patientsRes.value()?.data?.total    ?? 0);
-  readonly totalEmployees = computed(() => this.employeesRes.value()?.data?.total   ?? 0);
-  readonly totalCampaigns = computed(() => this.campaignsRes.value()?.data?.total   ?? 0);
-  readonly recentUsers    = computed(() => this.recentUsersRes.value()?.data?.data  ?? []);
+  readonly totalUsers     = computed(() => this.allUsersRes.value()?.data?.total   ?? 0);
+  readonly totalPatients  = computed(() => this.patientsRes.value()?.data?.total   ?? 0);
+  readonly totalEmployees = computed(() => this.employeesRes.value()?.data?.total  ?? 0);
+  readonly totalCampaigns = computed(() => this.campaignsRes.value()?.data?.total  ?? 0);
+  readonly recentUsers    = computed(() => this.recentUsersRes.value()?.data?.data ?? []);
   readonly tableLoading   = computed(() => this.recentUsersRes.isLoading());
   readonly statsLoading   = computed(() => this.allUsersRes.isLoading());
 
-  // ─── Colonnes DataTable ────────────────────────────────────────────────────
   readonly nameCell   = viewChild<TemplateRef<{ $implicit: User }>>('nameCell');
   readonly roleCell   = viewChild<TemplateRef<{ $implicit: User }>>('roleCell');
   readonly statusCell = viewChild<TemplateRef<{ $implicit: User }>>('statusCell');
 
   readonly columns = computed<TableColumn<User>[]>(() => [
-    { key: 'firstName', label: 'Utilisateur', template: this.nameCell() },
-    { key: 'role',      label: 'Rôle',        template: this.roleCell() },
-    { key: 'status',    label: 'Statut',       template: this.statusCell() },
+    { key: 'firstName', label: this.translate.instant('ADMIN.COLUMNS.USER'),   template: this.nameCell() },
+    { key: 'role',      label: this.translate.instant('ADMIN.COLUMNS.ROLE'),   template: this.roleCell() },
+    { key: 'status',    label: this.translate.instant('ADMIN.COLUMNS.STATUS'), template: this.statusCell() },
   ]);
 
-  // ─── Modal UserForm ────────────────────────────────────────────────────────
   readonly showUserForm = signal(false);
-
   openCreate(): void { this.showUserForm.set(true); }
-  closeForm(): void  { this.showUserForm.set(false); }
-
+  closeForm():  void  { this.showUserForm.set(false); }
   onUserSaved(): void {
     this.allUsersRes.reload();
     this.recentUsersRes.reload();

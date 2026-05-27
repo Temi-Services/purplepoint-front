@@ -1,6 +1,7 @@
 // src/app/features/medical/modals/appointment-form-modal.component.ts
 import { Component, OnInit, output, input, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
 import { AppointmentService, CreateAppointmentDto } from '../services/appointment.service';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -13,22 +14,21 @@ type AppointmentType = CreateAppointmentDto['type'];
 @Component({
   selector: 'pp-appointment-form-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, ModalComponent, PatientSearchComponent, LabelPipe],
+  imports: [ReactiveFormsModule, ModalComponent, PatientSearchComponent, LabelPipe, TranslateModule],
   templateUrl: './appointment-form-modal.component.html',
 })
 export class AppointmentFormModalComponent implements OnInit {
-  private readonly fb      = inject(FormBuilder);
-  private readonly service = inject(AppointmentService);
-  private readonly auth    = inject(AuthService);
+  private readonly fb        = inject(FormBuilder);
+  private readonly service   = inject(AppointmentService);
+  private readonly auth      = inject(AuthService);
+  private readonly translate = inject(TranslateService);
 
   readonly patientId = input<string>('');
-
   readonly saved  = output<void>();
   readonly closed = output<void>();
 
   readonly isLoading = signal(false);
   readonly error     = signal<string | null>(null);
-
   readonly types: AppointmentType[] = ['CONSULTATION', 'FOLLOW_UP', 'EMERGENCY', 'HOME_VISIT'];
 
   readonly form = this.fb.nonNullable.group({
@@ -64,7 +64,7 @@ export class AppointmentFormModalComponent implements OnInit {
       this.saved.emit();
       this.closed.emit();
     } catch {
-      this.error.set('Une erreur est survenue. Veuillez réessayer.');
+      this.error.set(this.translate.instant('MEDICAL.APPT_MODAL.ERROR_GENERIC'));
     } finally {
       this.isLoading.set(false);
     }

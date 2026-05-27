@@ -1,31 +1,32 @@
-// 📁 src/app/features/medical/pages/appointment-form/appointment-form.component.ts
-// ─────────────────────────────────────────────────────────────────────────────
+// src/app/features/medical/pages/appointment-form/appointment-form.component.ts
 import { Component, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AppointmentService } from '../../services/appointment.service';
 import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'pp-appointment-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TranslateModule],
   templateUrl: './appointment-form.component.html',
 })
 export class AppointmentFormComponent {
-  private readonly fb      = inject(FormBuilder);
-  private readonly router  = inject(Router);
-  private readonly apptSvc = inject(AppointmentService);
-  private readonly auth    = inject(AuthService);
+  private readonly fb        = inject(FormBuilder);
+  private readonly router    = inject(Router);
+  private readonly apptSvc   = inject(AppointmentService);
+  private readonly auth      = inject(AuthService);
+  private readonly translate = inject(TranslateService);
 
   readonly id        = input.required<string>();
   readonly isLoading = signal(false);
   readonly error     = signal<string | null>(null);
 
   readonly types = [
-    { value: 'CONSULTATION', label: 'Consultation'       },
-    { value: 'FOLLOW_UP',    label: 'Suivi'              },
-    { value: 'EMERGENCY',    label: 'Urgence'            },
-    { value: 'HOME_VISIT',   label: 'Visite à domicile'  },
+    { value: 'CONSULTATION', labelKey: 'LABELS.APPOINTMENT_TYPE.CONSULTATION' },
+    { value: 'FOLLOW_UP',    labelKey: 'LABELS.APPOINTMENT_TYPE.FOLLOW_UP' },
+    { value: 'EMERGENCY',    labelKey: 'LABELS.APPOINTMENT_TYPE.EMERGENCY' },
+    { value: 'HOME_VISIT',   labelKey: 'LABELS.APPOINTMENT_TYPE.HOME_VISIT' },
   ];
 
   readonly form = this.fb.nonNullable.group({
@@ -40,9 +41,7 @@ export class AppointmentFormComponent {
     if (this.form.invalid) return;
     this.isLoading.set(true);
     this.error.set(null);
-
     const { type, scheduledAt, duration, location, notes } = this.form.getRawValue();
-
     try {
       await this.apptSvc.createAppointment({
         patientId:   this.id(),
@@ -53,10 +52,9 @@ export class AppointmentFormComponent {
         location:    location || undefined,
         notes:       notes    || undefined,
       }).toPromise();
-
       this.router.navigate(['/medical/patients', this.id()]);
     } catch {
-      this.error.set('Erreur lors de la création du rendez-vous. Réessayez.');
+      this.error.set(this.translate.instant('MEDICAL.APPT_FORM.ERROR'));
     } finally {
       this.isLoading.set(false);
     }

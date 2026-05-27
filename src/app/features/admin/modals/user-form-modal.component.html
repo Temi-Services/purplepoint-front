@@ -1,15 +1,15 @@
+<!-- src/app/features/admin/modals/user-form-modal.component.html -->
 <pp-modal
-  [title]="isEdit() ? 'Modifier l\'utilisateur' : 'Créer un utilisateur'"
+  [title]="(isEdit() ? 'ADMIN.USER_MODAL.TITLE_EDIT' : 'ADMIN.USER_MODAL.TITLE_CREATE') | translate"
   size="lg"
-  submitLabel="Enregistrer"
+  [submitLabel]="'ADMIN.USER_MODAL.SUBMIT' | translate"
   [loading]="isLoading()"
   [submitDisabled]="form.invalid"
   (closed)="closed.emit()"
   (submitted)="onSubmit()"
 >
   @if (fetchError()) {
-    <div class="px-4 py-3 rounded-lg bg-red-50 border border-red-200
-                text-sm text-red-700 mb-4">
+    <div class="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700 mb-4">
       {{ fetchError() }}
     </div>
   }
@@ -21,94 +21,90 @@
       }
     </div>
   } @else {
-    <form [formGroup]="form" class="grid grid-cols-1 sm:grid-cols-2 gap-4"
-          (ngSubmit)="onSubmit()">
+    <form [formGroup]="form" class="grid grid-cols-1 sm:grid-cols-2 gap-4" (ngSubmit)="onSubmit()">
 
-      <!-- Prénom -->
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Prénom <span class="text-danger">*</span>
+          {{ 'ADMIN.USER_MODAL.FIRST_NAME_LABEL' | translate }}
         </label>
-        <input type="text" formControlName="firstName" placeholder="Jean" class="input" />
+        <input type="text" formControlName="firstName"
+               [placeholder]="'ADMIN.USER_MODAL.FIRST_NAME_PLACEHOLDER' | translate"
+               class="input" />
         @if (touched('firstName') && invalid('firstName', 'required')) {
-          <p class="text-xs text-danger mt-1">Champ requis.</p>
+          <p class="text-xs text-danger mt-1">{{ 'ADMIN.USER_MODAL.FIELD_REQUIRED' | translate }}</p>
         }
       </div>
 
-      <!-- Nom -->
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Nom <span class="text-danger">*</span>
+          {{ 'ADMIN.USER_MODAL.LAST_NAME_LABEL' | translate }}
         </label>
-        <input type="text" formControlName="lastName" placeholder="Dupont" class="input" />
+        <input type="text" formControlName="lastName"
+               [placeholder]="'ADMIN.USER_MODAL.LAST_NAME_PLACEHOLDER' | translate"
+               class="input" />
         @if (touched('lastName') && invalid('lastName', 'required')) {
-          <p class="text-xs text-danger mt-1">Champ requis.</p>
+          <p class="text-xs text-danger mt-1">{{ 'ADMIN.USER_MODAL.FIELD_REQUIRED' | translate }}</p>
         }
       </div>
 
-      <!-- Email -->
       <div class="sm:col-span-2">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Adresse e-mail <span class="text-danger">*</span>
+          {{ 'ADMIN.USER_MODAL.EMAIL_LABEL' | translate }}
         </label>
-        <input
-          type="email"
-          formControlName="email"
-          placeholder="jean.dupont@exemple.com"
-          class="input"
-          [class.opacity-60]="isEdit()"
-          [class.cursor-not-allowed]="isEdit()"
-        />
+        <input type="email" formControlName="email"
+               [placeholder]="'ADMIN.USER_MODAL.EMAIL_PLACEHOLDER' | translate"
+               class="input"
+               [class.opacity-60]="isEdit()"
+               [class.cursor-not-allowed]="isEdit()" />
         @if (touched('email') && invalid('email', 'email')) {
-          <p class="text-xs text-danger mt-1">Adresse e-mail invalide.</p>
+          <p class="text-xs text-danger mt-1">{{ 'ADMIN.USER_MODAL.EMAIL_INVALID' | translate }}</p>
         }
       </div>
 
-      <!-- Téléphone -->
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Téléphone
+          {{ 'ADMIN.USER_MODAL.PHONE_LABEL' | translate }}
         </label>
-        <input type="tel" formControlName="phone" placeholder="+33 6 00 00 00 00" class="input" />
+        <input type="tel" formControlName="phone"
+               [placeholder]="'ADMIN.USER_MODAL.PHONE_PLACEHOLDER' | translate"
+               class="input" />
       </div>
 
-      <!-- Région -->
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Région
+          {{ 'ADMIN.USER_MODAL.REGION_LABEL' | translate }}
         </label>
-        <input type="text" formControlName="region" placeholder="Île-de-France" class="input" />
+        <input type="text" formControlName="region"
+               [placeholder]="'ADMIN.USER_MODAL.REGION_PLACEHOLDER' | translate"
+               class="input" />
       </div>
 
-      <!-- Rôle -->
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Rôle <span class="text-danger">*</span>
+          {{ 'ADMIN.USER_MODAL.ROLE_LABEL' | translate }}
         </label>
         <select formControlName="role" class="input">
           @for (role of roles; track role) {
-            <option [value]="role">{{ roleLabel(role) }}</option>
+            <option [value]="role">{{ role | ppLabel:'role' }}</option>
           }
         </select>
       </div>
 
-      <!-- Statut (édition uniquement) -->
       @if (isEdit()) {
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            Statut
+            {{ 'ADMIN.USER_MODAL.STATUS_LABEL' | translate }}
           </label>
           <select formControlName="status" class="input">
-            <option value="ACTIVE">Actif</option>
-            <option value="INACTIVE">Inactif</option>
-            <option value="SUSPENDED">Suspendu</option>
+            <option value="ACTIVE">{{ 'LABELS.USER_STATUS.ACTIVE' | translate }}</option>
+            <option value="INACTIVE">{{ 'LABELS.USER_STATUS.INACTIVE' | translate }}</option>
+            <option value="SUSPENDED">{{ 'LABELS.USER_STATUS.SUSPENDED' | translate }}</option>
           </select>
         </div>
       }
 
       @if (saveError()) {
-        <div class="sm:col-span-2 px-4 py-3 rounded-lg bg-red-50 border border-red-200
-                    text-sm text-red-700">
+        <div class="sm:col-span-2 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
           {{ saveError() }}
         </div>
       }

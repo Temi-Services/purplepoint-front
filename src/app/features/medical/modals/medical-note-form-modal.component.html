@@ -1,8 +1,8 @@
 <!-- src/app/features/medical/modals/medical-note-form-modal.component.html -->
 <pp-modal
-  title="Nouvelle note médicale"
+  [title]="'MEDICAL.NOTE_MODAL.TITLE' | translate"
   size="md"
-  submitLabel="Enregistrer"
+  [submitLabel]="'MEDICAL.NOTE_MODAL.SUBMIT' | translate"
   [loading]="isLoading()"
   [submitDisabled]="form.invalid || !resolvedPatientId"
   (closed)="closed.emit()"
@@ -15,8 +15,6 @@
   }
 
   <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
-
-    <!-- Sélecteur patient : masqué si patientId déjà fourni en input -->
     @if (!patientId()) {
       <pp-patient-search
         (patientSelected)="onPatientSelected($event)"
@@ -26,18 +24,19 @@
 
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Note médicale <span class="text-danger">*</span>
+        {{ 'MEDICAL.NOTE_MODAL.CONTENT_LABEL' | translate }}
       </label>
       <textarea
         formControlName="content"
         rows="5"
-        placeholder="Observations, diagnostic, plan de traitement…"
+        [placeholder]="'MEDICAL.NOTE_MODAL.CONTENT_PLACEHOLDER' | translate"
         class="input resize-none"
       ></textarea>
       @if (form.get('content')?.touched && form.get('content')?.hasError('minlength')) {
-        <p class="text-xs text-danger mt-1">Minimum 10 caractères.</p>
+        <p class="text-xs text-danger mt-1">
+          {{ 'MEDICAL.NOTE_MODAL.CONTENT_MIN_LENGTH' | translate }}
+        </p>
       }
     </div>
-
   </form>
 </pp-modal>

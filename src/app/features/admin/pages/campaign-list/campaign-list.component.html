@@ -1,14 +1,14 @@
+<!-- src/app/features/admin/pages/campaign-list/campaign-list.component.html -->
 <div class="max-w-5xl mx-auto px-4 py-8">
-
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-semibold text-gray-900">Campaigns</h1>
-      <p class="text-sm text-muted mt-1">{{ total() }} campaigns created</p>
+      <h1 class="text-2xl font-semibold text-gray-900">{{ 'ADMIN.CAMPAIGN_LIST.TITLE' | translate }}</h1>
+      <p class="text-sm text-muted mt-1">{{ totalLabel() }}</p>
     </div>
     <a routerLink="../campaigns/new"
        class="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md
               hover:bg-primary-hover transition-colors">
-      + New campaign
+      {{ 'ADMIN.CAMPAIGN_LIST.NEW_CAMPAIGN' | translate }}
     </a>
   </div>
 
@@ -20,7 +20,6 @@
       </svg>
     </div>
   } @else {
-
     <div class="grid gap-4">
       @for (campaign of campaigns(); track campaign.id) {
         <div class="bg-surface rounded-lg border border-border p-5">
@@ -30,59 +29,59 @@
                 <h2 class="text-sm font-medium text-gray-900 truncate">{{ campaign.title }}</h2>
                 <span class="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
                       [class]="statusStyle(campaign.status)">
-                  {{ statusLabel(campaign.status) }}
+                  {{ campaign.status | ppLabel:'campaignStatus' }}
                 </span>
               </div>
               <p class="text-sm text-muted line-clamp-2">{{ campaign.message }}</p>
               <div class="flex items-center gap-4 mt-2 text-xs text-muted">
-                <span>Target: {{ campaign.target }}</span>
+                <span>{{ 'ADMIN.CAMPAIGN_LIST.TARGET_LABEL' | translate }} {{ campaign.target }}</span>
                 @if (campaign.region) {
-                  <span>Region: {{ campaign.region }}</span>
+                  <span>{{ 'ADMIN.CAMPAIGN_LIST.REGION_LABEL' | translate }} {{ campaign.region }}</span>
                 }
                 @if (campaign.recipientCount !== undefined) {
-                  <span>{{ campaign.recipientCount }} recipients</span>
+                  <span>{{ 'ADMIN.CAMPAIGN_LIST.RECIPIENTS_LABEL' | translate : { count: campaign.recipientCount } }}</span>
                 }
                 @if (campaign.scheduledAt) {
                   <span>
-                    Scheduled: {{ campaign.scheduledAt | date:'d MMM yyyy' }}
+                    {{ 'ADMIN.CAMPAIGN_LIST.SCHEDULED_LABEL' | translate }}
+                    {{ campaign.scheduledAt | date:'d MMM yyyy' }}
                   </span>
                 }
               </div>
             </div>
             @if (campaign.status === 'DRAFT') {
-              <button
-                (click)="delete(campaign.id)"
-                class="flex-shrink-0 text-xs text-danger hover:underline"
-              >
-                Delete
+              <button (click)="delete(campaign.id)"
+                      class="flex-shrink-0 text-xs text-danger hover:underline">
+                {{ 'ADMIN.CAMPAIGN_LIST.DELETE' | translate }}
               </button>
             }
           </div>
         </div>
       } @empty {
         <div class="bg-surface rounded-lg border border-border px-6 py-12 text-center">
-          <p class="text-sm text-muted">No campaigns created.</p>
+          <p class="text-sm text-muted">{{ 'ADMIN.CAMPAIGN_LIST.EMPTY' | translate }}</p>
         </div>
       }
     </div>
 
     @if (totalPages() > 1) {
       <div class="flex items-center justify-between mt-4">
-        <p class="text-xs text-muted">Page {{ page() }} of {{ totalPages() }}</p>
+        <p class="text-xs text-muted">
+          {{ 'ADMIN.CAMPAIGN_LIST.PAGE_INFO' | translate : { page: page(), total: totalPages() } }}
+        </p>
         <div class="flex gap-2">
           <button (click)="goToPage(page() - 1)" [disabled]="page() === 1"
                   class="px-3 py-1.5 text-xs rounded-md border border-border
-                   hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed">
-            Previous
+                         hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed">
+            {{ 'ADMIN.CAMPAIGN_LIST.PREV' | translate }}
           </button>
           <button (click)="goToPage(page() + 1)" [disabled]="page() === totalPages()"
                   class="px-3 py-1.5 text-xs rounded-md border border-border
-                   hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed">
-            Next
+                         hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed">
+            {{ 'ADMIN.CAMPAIGN_LIST.NEXT' | translate }}
           </button>
         </div>
       </div>
     }
-
   }
 </div>

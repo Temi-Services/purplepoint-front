@@ -1,8 +1,8 @@
 <!-- src/app/features/medical/modals/appointment-form-modal.component.html -->
 <pp-modal
-  title="Nouveau rendez-vous"
+  [title]="'MEDICAL.APPT_MODAL.TITLE' | translate"
   size="md"
-  submitLabel="Créer"
+  [submitLabel]="'MEDICAL.APPT_MODAL.SUBMIT' | translate"
   [loading]="isLoading()"
   [submitDisabled]="form.invalid"
   (closed)="closed.emit()"
@@ -15,7 +15,6 @@
   }
 
   <form [formGroup]="form" class="flex flex-col gap-4" (ngSubmit)="onSubmit()">
-
     @if (!patientId()) {
       <pp-patient-search
         (patientSelected)="onPatientSelected($event)"
@@ -26,7 +25,7 @@
     <div class="grid grid-cols-2 gap-4">
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Type <span class="text-danger">*</span>
+          {{ 'MEDICAL.APPT_MODAL.TYPE_LABEL' | translate }}
         </label>
         <select formControlName="type" class="input">
           @for (t of types; track t) {
@@ -36,7 +35,7 @@
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-          Durée (min) <span class="text-danger">*</span>
+          {{ 'MEDICAL.APPT_MODAL.DURATION_LABEL' | translate }}
         </label>
         <input type="number" formControlName="duration" min="5" class="input" />
       </div>
@@ -44,18 +43,18 @@
 
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Date et heure <span class="text-danger">*</span>
+        {{ 'MEDICAL.APPT_MODAL.DATE_LABEL' | translate }}
       </label>
       <input type="datetime-local" formControlName="scheduledAt" class="input" />
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Lieu
+        {{ 'MEDICAL.APPT_MODAL.LOCATION_LABEL' | translate }}
       </label>
       <input type="text" formControlName="location"
-             placeholder="Cabinet, domicile…" class="input" />
+             [placeholder]="'MEDICAL.APPT_MODAL.LOCATION_PLACEHOLDER' | translate"
+             class="input" />
     </div>
-
   </form>
 </pp-modal>

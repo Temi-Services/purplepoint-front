@@ -1,42 +1,34 @@
+// src/app/features/admin/modals/user-form-modal.component.ts
 import { Component, input, output, inject, signal, OnInit, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ModalComponent } from '../../../shared/components/modal/modal.component';
+import { LabelPipe } from '../../../core/pipes/label.pipe';
 import { AdminUserService } from '../services/admin-user.service';
 import { UserRole } from '../../../core/models/roles.enum';
 
 const ROLES = Object.values(UserRole);
 
-const ROLE_LABELS: Record<UserRole, string> = {
-  [UserRole.PATIENT]:  'Patient',
-  [UserRole.MEDICAL]:  'Médecin',
-  [UserRole.AIDANT]:   'Aidant',
-  [UserRole.EMPLOYEE]: 'Employé',
-  [UserRole.ADMIN]:    'Admin',
-  [UserRole.CEO]:      'CEO',
-};
-
 @Component({
   selector: 'pp-user-form-modal',
-  imports: [ReactiveFormsModule, ModalComponent],
+  imports: [ReactiveFormsModule, ModalComponent, LabelPipe, TranslateModule],
   templateUrl: './user-form-modal.component.html',
 })
 export class UserFormModalComponent implements OnInit {
   private readonly fb          = inject(FormBuilder);
   private readonly userService = inject(AdminUserService);
+  private readonly translate   = inject(TranslateService);
 
   readonly userId = input<string | undefined>(undefined);
-
   readonly saved  = output<void>();
   readonly closed = output<void>();
 
-  readonly isEdit    = computed(() => !!this.userId());
-  readonly isLoading = signal(false);
+  readonly isEdit     = computed(() => !!this.userId());
+  readonly isLoading  = signal(false);
   readonly isFetching = signal(false);
   readonly fetchError = signal<string | null>(null);
   readonly saveError  = signal<string | null>(null);
-
   readonly roles = ROLES;
-  readonly roleLabel = (r: UserRole) => ROLE_LABELS[r];
 
   readonly form = this.fb.nonNullable.group({
     firstName: ['', Validators.required],
@@ -51,7 +43,6 @@ export class UserFormModalComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     const id = this.userId();
     if (!id) return;
-
     this.isFetching.set(true);
     this.fetchError.set(null);
     try {
@@ -68,38 +59,28 @@ export class UserFormModalComponent implements OnInit {
       });
       this.form.controls.email.disable();
     } catch {
-      this.fetchError.set('Impossible de charger l\'utilisateur.');
+      this.fetchError.set(this.translate.instant('ADMIN.USER_MODAL.FETCH_ERROR'));
     } finally {
       this.isFetching.set(false);
     }
   }
 
   async onSubmit(): Promise<void> {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.isLoading.set(true);
     this.saveError.set(null);
-
-    const { firstName, lastName, email, phone, region, role, status } =
-      this.form.getRawValue();
-
+    const { firstName, lastName, email, phone, region, role, status } = this.form.getRawValue();
     try {
       if (this.isEdit()) {
         await this.userService.update(this.userId()!, {
-          firstName,
-          lastName,
+          firstName, lastName,
           phone:  phone  || undefined,
           region: region || undefined,
           status,
         }).toPromise();
       } else {
         await this.userService.create({
-          email,
-          firstName,
-          lastName,
+          email, firstName, lastName,
           phone:  phone  || undefined,
           region: region || undefined,
           role,
@@ -108,18 +89,12 @@ export class UserFormModalComponent implements OnInit {
       this.saved.emit();
       this.closed.emit();
     } catch {
-      this.saveError.set('Une erreur est survenue. Veuillez réessayer.');
+      this.saveError.set(this.translate.instant('ADMIN.USER_MODAL.SAVE_ERROR'));
     } finally {
       this.isLoading.set(false);
     }
   }
 
-  // ─── Helpers template ─────────────────────────────────────────────────────
-  touched(field: string): boolean {
-    return !!this.form.get(field)?.touched;
-  }
-
-  invalid(field: string, error: string): boolean {
-    return !!this.form.get(field)?.hasError(error);
-  }
+  touched(field: string): boolean { return !!this.form.get(field)?.touched; }
+  invalid(field: string, error: string): boolean { return !!this.form.get(field)?.hasError(error); }
 }

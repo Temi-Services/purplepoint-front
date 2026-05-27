@@ -1,5 +1,4 @@
-// 📁 src/app/features/medical/pages/dashboard/medical-dashboard.component.ts
-// ─────────────────────────────────────────────────────────────────────────────
+// src/app/features/medical/pages/dashboard/medical-dashboard.component.ts
 import {
   Component,
   inject,
@@ -10,7 +9,7 @@ import {
 } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ApiResponse, PaginatedData } from '../../../../core/http/api-types';
@@ -28,6 +27,7 @@ import { MedicationFormModalComponent } from '../../modals/medication-form-modal
   selector: 'pp-medical-dashboard',
   imports: [
     RouterLink,
+    TranslateModule,
     WelcomeCardComponent,
     StatCardComponent,
     DataTableComponent,
@@ -39,13 +39,13 @@ import { MedicationFormModalComponent } from '../../modals/medication-form-modal
   templateUrl: './medical-dashboard.component.html',
 })
 export class MedicalDashboardComponent {
-  private readonly auth = inject(AuthService);
+  private readonly auth      = inject(AuthService);
+  private readonly translate = inject(TranslateService);
 
   readonly providerId = computed(() => this.auth.currentUser()?.id ?? '');
   readonly userName   = computed(() => this.auth.currentUser()?.firstName ?? '');
   private readonly ready = computed(() => !!this.providerId());
 
-  // ─── Stats ────────────────────────────────────────────────────────────────
   readonly patientsRes = httpResource<ApiResponse<PaginatedData<User>>>(() => ({
     url:    `${environment.apiUrl}/users`,
     params: { page: '1', limit: '5', role: UserRole.PATIENT },
@@ -53,7 +53,6 @@ export class MedicalDashboardComponent {
 
   readonly apptTodayRes = httpResource<ApiResponse<PaginatedData<unknown>>>(() => {
     if (!this.ready()) return undefined;
-    // Filtrage par from/to (aujourd'hui minuit → demain minuit) + providerId
     const from = new Date(); from.setHours(0, 0, 0, 0);
     const to   = new Date(); to.setHours(23, 59, 59, 999);
     return {
@@ -67,26 +66,24 @@ export class MedicalDashboardComponent {
     };
   });
 
-  readonly totalPatients  = computed(() => this.patientsRes.value()?.data?.total   ?? 0);
-  readonly totalApptToday = computed(() => this.apptTodayRes.value()?.data?.total  ?? 0);
-  readonly recentPatients = computed(() => this.patientsRes.value()?.data?.data    ?? []);
+  readonly totalPatients  = computed(() => this.patientsRes.value()?.data?.total  ?? 0);
+  readonly totalApptToday = computed(() => this.apptTodayRes.value()?.data?.total ?? 0);
+  readonly recentPatients = computed(() => this.patientsRes.value()?.data?.data   ?? []);
   readonly statsLoading   = computed(() => this.patientsRes.isLoading());
   readonly tableLoading   = computed(() => this.patientsRes.isLoading());
 
-  // ─── Colonnes DataTable ────────────────────────────────────────────────────
   readonly nameCell   = viewChild<TemplateRef<{ $implicit: User }>>('nameCell');
   readonly statusCell = viewChild<TemplateRef<{ $implicit: User }>>('statusCell');
 
   readonly columns = computed<TableColumn<User>[]>(() => [
-    { key: 'firstName', label: 'Patient',  template: this.nameCell() },
-    { key: 'region',    label: 'Région' },
-    { key: 'status',    label: 'Statut',   template: this.statusCell() },
+    { key: 'firstName', label: this.translate.instant('MEDICAL.COLUMNS.PATIENT'),  template: this.nameCell() },
+    { key: 'region',    label: this.translate.instant('MEDICAL.COLUMNS.REGION') },
+    { key: 'status',    label: this.translate.instant('MEDICAL.COLUMNS.STATUS'),   template: this.statusCell() },
   ]);
 
-  // ─── Modales ──────────────────────────────────────────────────────────────
-  readonly showAppt     = signal(false);
-  readonly showNote     = signal(false);
-  readonly showMed      = signal(false);
+  readonly showAppt = signal(false);
+  readonly showNote = signal(false);
+  readonly showMed  = signal(false);
 
   onSaved(): void {
     this.showAppt.set(false);

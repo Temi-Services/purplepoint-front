@@ -1,8 +1,8 @@
-// 📁 src/app/features/medical/pages/patient-detail/patient-detail.component.ts
-// ─────────────────────────────────────────────────────────────────────────────
+// src/app/features/medical/pages/patient-detail/patient-detail.component.ts
 import { Component, OnInit, inject, signal, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 import { AdminUserService } from '../../../admin/services/admin-user.service';
 import { MedicalRecordService } from '../../services/medical-record.service';
@@ -14,7 +14,6 @@ import { Medication } from '../../../../core/models/medication.model';
 import { Appointment } from '../../../../core/models/appointment.model';
 import { AdherenceBadgeComponent } from '../../../patient/components/adherence-badge/adherence-badge';
 import { LabelPipe } from '../../../../core/pipes/label.pipe';
-import { label } from '../../../../core/utils/label.utils';
 import { AppointmentFormModalComponent } from '../../modals/appointment-form-modal.component';
 import { MedicationFormModalComponent } from '../../modals/medication-form-modal.component';
 import { MedicalNoteFormModalComponent } from '../../modals/medical-note-form-modal.component';
@@ -24,7 +23,7 @@ type Tab = 'record' | 'medications' | 'appointments' | 'notes';
 @Component({
   selector: 'pp-patient-detail',
   imports: [
-    RouterLink, DatePipe, AdherenceBadgeComponent, LabelPipe,
+    RouterLink, DatePipe, TranslateModule, AdherenceBadgeComponent, LabelPipe,
     AppointmentFormModalComponent,
     MedicationFormModalComponent,
     MedicalNoteFormModalComponent,
@@ -36,11 +35,9 @@ export class PatientDetailComponent implements OnInit {
   private readonly recordSvc   = inject(MedicalRecordService);
   private readonly medSvc      = inject(MedicationService);
   private readonly apptSvc     = inject(AppointmentService);
+  private readonly translate   = inject(TranslateService);
 
   readonly id = input.required<string>();
-
-  // Exposé au template pour les traductions : label.bloodType(record.bloodType)
-  readonly label = label;
 
   readonly patient      = signal<User | null>(null);
   readonly record       = signal<MedicalRecord | null>(null);
@@ -49,7 +46,6 @@ export class PatientDetailComponent implements OnInit {
   readonly isLoading    = signal(true);
   readonly activeTab    = signal<Tab>('record');
 
-  // ─── Modales ───────────────────────────────────────────────────────────────
   readonly showApptModal = signal(false);
   readonly showMedModal  = signal(false);
   readonly showNoteModal = signal(false);
@@ -61,11 +57,11 @@ export class PatientDetailComponent implements OnInit {
     return Math.round((active / meds.length) * 100);
   });
 
-  readonly tabs: { key: Tab; label: string }[] = [
-    { key: 'record',       label: 'Dossier médical' },
-    { key: 'medications',  label: 'Traitements'     },
-    { key: 'appointments', label: 'Rendez-vous'     },
-    { key: 'notes',        label: 'Notes'           },
+  readonly tabs: { key: Tab; labelKey: string }[] = [
+    { key: 'record',       labelKey: 'MEDICAL.PATIENT_DETAIL.TAB_RECORD' },
+    { key: 'medications',  labelKey: 'MEDICAL.PATIENT_DETAIL.TAB_MEDICATIONS' },
+    { key: 'appointments', labelKey: 'MEDICAL.PATIENT_DETAIL.TAB_APPOINTMENTS' },
+    { key: 'notes',        labelKey: 'MEDICAL.PATIENT_DETAIL.TAB_NOTES' },
   ];
 
   async ngOnInit(): Promise<void> {
@@ -73,16 +69,11 @@ export class PatientDetailComponent implements OnInit {
     this.isLoading.set(true);
     try {
       const [patient, record, meds, appts] = await Promise.all([
-        // getById retourne User directement (BaseApiService unwrap)
         firstValueFrom(this.userService.getById(id)),
-        // getByPatient retourne MedicalRecord directement
         firstValueFrom(this.recordSvc.getByPatient(id)),
-        // getByPatient retourne PaginatedData<Medication> → .data = Medication[]
         firstValueFrom(this.medSvc.getByPatient(id)),
-        // getByPatient retourne PaginatedData<Appointment> → .data = Appointment[]
         firstValueFrom(this.apptSvc.getByPatient(id)),
       ]);
-
       this.patient.set(patient ?? null);
       this.record.set(record  ?? null);
       this.medications.set(meds?.data   ?? []);
@@ -94,15 +85,12 @@ export class PatientDetailComponent implements OnInit {
     }
   }
 
-  setTab(tab: Tab): void {
-    this.activeTab.set(tab);
-  }
+  setTab(tab: Tab): void { this.activeTab.set(tab); }
 
   async onModalSaved(): Promise<void> {
     this.showApptModal.set(false);
     this.showMedModal.set(false);
     this.showNoteModal.set(false);
-    // Recharger les données
     const id = this.id();
     const [meds, appts, record] = await Promise.all([
       firstValueFrom(this.medSvc.getByPatient(id)),

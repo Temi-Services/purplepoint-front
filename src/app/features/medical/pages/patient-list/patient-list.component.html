@@ -1,20 +1,18 @@
+<!-- src/app/features/medical/pages/patient-list/patient-list.component.html -->
 <div class="max-w-5xl mx-auto px-4 py-8">
-
-  <!-- Header -->
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-semibold text-gray-900">Patients</h1>
-      <p class="text-sm text-muted mt-1">{{ total() }} patients enregistrés</p>
+      <h1 class="text-2xl font-semibold text-gray-900">{{ 'MEDICAL.PATIENT_LIST.TITLE' | translate }}</h1>
+      <p class="text-sm text-muted mt-1">{{ totalLabel() }}</p>
     </div>
   </div>
 
-  <!-- Search -->
   <div class="mb-6">
     <input
       type="text"
       [ngModel]="search()"
       (ngModelChange)="search.set($event)"
-      placeholder="Rechercher par nom, email ou région…"
+      [placeholder]="'MEDICAL.PATIENT_LIST.SEARCH_PLACEHOLDER' | translate"
       class="w-full sm:max-w-sm px-3 py-2 rounded-md border border-border bg-surface
              text-sm focus:outline-none focus:ring-2 focus:ring-primary
              focus:border-transparent placeholder:text-muted"
@@ -29,16 +27,22 @@
       </svg>
     </div>
   } @else {
-
-    <!-- Table -->
     <div class="bg-surface rounded-lg border border-border overflow-hidden">
       <table class="w-full text-sm">
         <thead>
         <tr class="border-b border-border bg-surface-2">
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">Patient</th>
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden sm:table-cell">Email</th>
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden md:table-cell">Région</th>
-          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">Statut</th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">
+            {{ 'MEDICAL.PATIENT_LIST.COL_PATIENT' | translate }}
+          </th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden sm:table-cell">
+            {{ 'MEDICAL.PATIENT_LIST.COL_EMAIL' | translate }}
+          </th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide hidden md:table-cell">
+            {{ 'MEDICAL.PATIENT_LIST.COL_REGION' | translate }}
+          </th>
+          <th class="text-left px-4 py-3 text-xs font-medium text-muted uppercase tracking-wide">
+            {{ 'MEDICAL.PATIENT_LIST.COL_STATUS' | translate }}
+          </th>
           <th class="px-4 py-3"></th>
         </tr>
         </thead>
@@ -61,23 +65,21 @@
               <td class="px-4 py-3 text-muted hidden md:table-cell">{{ patient.region ?? '—' }}</td>
               <td class="px-4 py-3">
                 <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
-                      [class]="patient.status === 'ACTIVE'
-                    ? 'bg-green-50 text-success'
-                    : 'bg-gray-100 text-muted'">
-                  {{ patient.status }}
+                      [class]="patient.status === 'ACTIVE' ? 'bg-green-50 text-success' : 'bg-gray-100 text-muted'">
+                  {{ patient.status | ppLabel:'userStatus' }}
                 </span>
               </td>
               <td class="px-4 py-3 text-right">
                 <a [routerLink]="['/medical/patients', patient.id]"
                    class="text-xs font-medium text-primary hover:underline">
-                  Voir
+                  {{ 'MEDICAL.PATIENT_LIST.VIEW' | translate }}
                 </a>
               </td>
             </tr>
           } @empty {
             <tr>
               <td colspan="5" class="px-4 py-12 text-center text-sm text-muted">
-                Aucun patient trouvé.
+                {{ 'MEDICAL.PATIENT_LIST.EMPTY' | translate }}
               </td>
             </tr>
           }
@@ -85,32 +87,24 @@
       </table>
     </div>
 
-    <!-- Pagination -->
     @if (totalPages() > 1) {
       <div class="flex items-center justify-between mt-4">
         <p class="text-xs text-muted">
-          Page {{ page() }} sur {{ totalPages() }}
+          {{ 'MEDICAL.PATIENT_LIST.PAGE_INFO' | translate : { page: page(), total: totalPages() } }}
         </p>
         <div class="flex gap-2">
-          <button
-            (click)="goToPage(page() - 1)"
-            [disabled]="page() === 1"
+          <button (click)="goToPage(page() - 1)" [disabled]="page() === 1"
             class="px-3 py-1.5 text-xs rounded-md border border-border
-                   hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            Précédent
+                   hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+            {{ 'MEDICAL.PATIENT_LIST.PREV' | translate }}
           </button>
-          <button
-            (click)="goToPage(page() + 1)"
-            [disabled]="page() === totalPages()"
+          <button (click)="goToPage(page() + 1)" [disabled]="page() === totalPages()"
             class="px-3 py-1.5 text-xs rounded-md border border-border
-                   hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            Suivant
+                   hover:bg-surface-2 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+            {{ 'MEDICAL.PATIENT_LIST.NEXT' | translate }}
           </button>
         </div>
       </div>
     }
-
   }
 </div>

@@ -1,35 +1,22 @@
-<!-- ── Modales ──────────────────────────────────────────────────────────────── -->
+<!-- src/app/features/medical/pages/patient-detail/patient-detail.component.html -->
 @if (showApptModal()) {
-  <pp-appointment-form-modal
-    [patientId]="id()"
-    (saved)="onModalSaved()"
-    (closed)="showApptModal.set(false)"
-  />
+  <pp-appointment-form-modal [patientId]="id()" (saved)="onModalSaved()" (closed)="showApptModal.set(false)" />
 }
 @if (showMedModal()) {
-  <pp-medication-form-modal
-    [patientId]="id()"
-    (saved)="onModalSaved()"
-    (closed)="showMedModal.set(false)"
-  />
+  <pp-medication-form-modal [patientId]="id()" (saved)="onModalSaved()" (closed)="showMedModal.set(false)" />
 }
 @if (showNoteModal()) {
-  <pp-medical-note-form-modal
-    [patientId]="id()"
-    (saved)="onModalSaved()"
-    (closed)="showNoteModal.set(false)"
-  />
+  <pp-medical-note-form-modal [patientId]="id()" (saved)="onModalSaved()" (closed)="showNoteModal.set(false)" />
 }
 
 <div class="max-w-5xl mx-auto px-4 py-8">
 
-  <!-- Back -->
   <a routerLink="/medical/patients"
      class="inline-flex items-center gap-1.5 text-sm text-muted hover:text-gray-900 mb-6 transition-colors">
     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M19 12H5M12 5l-7 7 7 7"/>
     </svg>
-    Retour aux patients
+    {{ 'MEDICAL.PATIENT_DETAIL.BACK' | translate }}
   </a>
 
   @if (isLoading()) {
@@ -61,7 +48,7 @@
           </div>
         </div>
         <div class="flex-shrink-0">
-          <p class="text-xs text-muted mb-1">Adhérence</p>
+          <p class="text-xs text-muted mb-1">{{ 'MEDICAL.PATIENT_DETAIL.ADHERENCE_LABEL' | translate }}</p>
           <pp-adherence-badge [score]="adherenceScore()" />
         </div>
       </div>
@@ -78,25 +65,29 @@
               ? 'border-primary text-primary'
               : 'border-transparent text-muted hover:text-gray-900'"
           >
-            {{ tab.label }}
+            {{ tab.labelKey | translate }}
           </button>
         }
       </nav>
     </div>
 
-    <!-- ── Dossier médical ──────────────────────────────────────────────────── -->
+    <!-- Dossier médical -->
     @if (activeTab() === 'record') {
       <div class="bg-surface rounded-lg border border-border p-6">
         @if (record()) {
           <div class="grid sm:grid-cols-2 gap-6">
             <div>
-              <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">Groupe sanguin</p>
+              <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">
+                {{ 'MEDICAL.PATIENT_DETAIL.BLOOD_TYPE' | translate }}
+              </p>
               <p class="text-sm text-gray-900 dark:text-gray-100">
                 {{ record()?.bloodType | ppLabel:'bloodType' }}
               </p>
             </div>
             <div>
-              <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">Allergies</p>
+              <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">
+                {{ 'MEDICAL.PATIENT_DETAIL.ALLERGIES' | translate }}
+              </p>
               @if ((record()?.allergies?.length ?? 0) > 0) {
                 <div class="flex flex-wrap gap-1.5">
                   @for (allergy of record()?.allergies ?? []; track allergy) {
@@ -106,11 +97,13 @@
                   }
                 </div>
               } @else {
-                <p class="text-sm text-muted">Aucune allergie connue</p>
+                <p class="text-sm text-muted">{{ 'MEDICAL.PATIENT_DETAIL.NO_ALLERGIES' | translate }}</p>
               }
             </div>
             <div class="sm:col-span-2">
-              <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">Maladies chroniques</p>
+              <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">
+                {{ 'MEDICAL.PATIENT_DETAIL.CHRONIC_DISEASES' | translate }}
+              </p>
               @if ((record()?.chronicDiseases?.length ?? 0) > 0) {
                 <div class="flex flex-wrap gap-1.5">
                   @for (disease of record()?.chronicDiseases ?? []; track disease) {
@@ -120,23 +113,22 @@
                   }
                 </div>
               } @else {
-                <p class="text-sm text-muted">Aucune maladie chronique enregistrée</p>
+                <p class="text-sm text-muted">{{ 'MEDICAL.PATIENT_DETAIL.NO_CHRONIC' | translate }}</p>
               }
             </div>
           </div>
         } @else {
-          <p class="text-sm text-muted text-center py-8">Aucun dossier médical disponible.</p>
+          <p class="text-sm text-muted text-center py-8">{{ 'MEDICAL.PATIENT_DETAIL.NO_RECORD' | translate }}</p>
         }
       </div>
     }
 
-    <!-- ── Traitements ─────────────────────────────────────────────────────── -->
+    <!-- Traitements -->
     @if (activeTab() === 'medications') {
       <div class="flex justify-end mb-4">
-        <button type="button" (click)="showMedModal.set(true)"
-                class="btn-primary text-sm">
+        <button type="button" (click)="showMedModal.set(true)" class="btn-primary text-sm">
           <i class="ti ti-plus" aria-hidden="true"></i>
-          Prescrire
+          {{ 'MEDICAL.PATIENT_DETAIL.PRESCRIBE' | translate }}
         </button>
       </div>
       <div class="grid gap-3">
@@ -159,19 +151,18 @@
           </div>
         } @empty {
           <div class="bg-surface rounded-lg border border-border px-6 py-10 text-center">
-            <p class="text-sm text-muted">Aucun traitement enregistré.</p>
+            <p class="text-sm text-muted">{{ 'MEDICAL.PATIENT_DETAIL.NO_MEDICATIONS' | translate }}</p>
           </div>
         }
       </div>
     }
 
-    <!-- ── Rendez-vous ─────────────────────────────────────────────────────── -->
+    <!-- Rendez-vous -->
     @if (activeTab() === 'appointments') {
       <div class="flex justify-end mb-4">
-        <button type="button" (click)="showApptModal.set(true)"
-                class="btn-primary text-sm">
+        <button type="button" (click)="showApptModal.set(true)" class="btn-primary text-sm">
           <i class="ti ti-plus" aria-hidden="true"></i>
-          Ajouter un RDV
+          {{ 'MEDICAL.PATIENT_DETAIL.ADD_APPT' | translate }}
         </button>
       </div>
       <div class="grid gap-3">
@@ -183,7 +174,7 @@
               </p>
               <p class="text-xs text-muted mt-0.5">
                 {{ appt.scheduledAt | date:'EEEE d MMMM yyyy, HH:mm' }}
-                · {{ appt.duration }} min
+                · {{ 'MEDICAL.PATIENT_DETAIL.DURATION_MIN' | translate : { duration: appt.duration } }}
               </p>
               @if (appt.location) {
                 <p class="text-xs text-muted mt-0.5">📍 {{ appt.location }}</p>
@@ -200,32 +191,29 @@
           </div>
         } @empty {
           <div class="bg-surface rounded-lg border border-border px-6 py-10 text-center">
-            <p class="text-sm text-muted">Aucun rendez-vous enregistré.</p>
+            <p class="text-sm text-muted">{{ 'MEDICAL.PATIENT_DETAIL.NO_APPOINTMENTS' | translate }}</p>
           </div>
         }
       </div>
     }
 
-    <!-- ── Notes médicales ────────────────────────────────────────────────── -->
+    <!-- Notes médicales -->
     @if (activeTab() === 'notes') {
       <div class="flex justify-end mb-4">
-        <button type="button" (click)="showNoteModal.set(true)"
-                class="btn-primary text-sm">
+        <button type="button" (click)="showNoteModal.set(true)" class="btn-primary text-sm">
           <i class="ti ti-plus" aria-hidden="true"></i>
-          Ajouter une note
+          {{ 'MEDICAL.PATIENT_DETAIL.ADD_NOTE' | translate }}
         </button>
       </div>
       <div class="grid gap-3">
         @for (note of record()?.notes ?? []; track note.id) {
           <div class="bg-surface rounded-lg border border-border p-4">
             <p class="text-sm text-gray-900 dark:text-gray-100 leading-relaxed">{{ note.content }}</p>
-            <p class="text-xs text-muted mt-2">
-              {{ note.createdAt | date:'d MMMM yyyy à HH:mm' }}
-            </p>
+            <p class="text-xs text-muted mt-2">{{ note.createdAt | date:'d MMMM yyyy · HH:mm' }}</p>
           </div>
         } @empty {
           <div class="bg-surface rounded-lg border border-border px-6 py-10 text-center">
-            <p class="text-sm text-muted">Aucune note médicale.</p>
+            <p class="text-sm text-muted">{{ 'MEDICAL.PATIENT_DETAIL.NO_NOTES' | translate }}</p>
           </div>
         }
       </div>

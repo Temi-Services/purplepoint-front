@@ -37,6 +37,12 @@
       "DEFAULT_CONFIRM": "Confirmer",
       "CANCEL": "Annuler"
     },
+    "DATA_TABLE": {
+      "PAGINATION": "{{ start }}–{{ end }} sur {{ total }}",
+      "EMPTY_DESCRIPTION": "Il n'y a rien à afficher pour le moment.",
+      "EDIT": "Modifier",
+      "DELETE": "Supprimer"
+    },
     "MODAL": {
       "CLOSE": "Fermer",
       "CANCEL": "Annuler",
@@ -156,12 +162,8 @@
       "TEXT": "Texte",
       "VOICE": "Vocal"
     },
-    "DATA_TABLE": {
-      "EMPTY_DESCRIPTION": "Il n'y a rien à afficher pour le moment.",
-      "EDIT": "Modifier",
-      "DELETE": "Supprimer"
-    },
-    "PAGINATION": "{{ start }}–{{ end }} sur {{ total }}",
+
+
     "PATIENT": {
       "DASHBOARD": {
         "IMAGE_ALT": "Tableau de bord patient",
@@ -326,6 +328,253 @@
         "DATE": "Date",
         "DURATION": "Durée",
         "OUTCOME": "Résultat"
+      }
+    },
+    "MEDICAL": {
+      "DASHBOARD": {
+        "SUBTITLE": "Suivez vos patients",
+        "IMAGE_ALT": "Tableau de bord médecin",
+        "STAT_PATIENTS": "Patients suivis",
+        "STAT_APPT_TODAY": "RDV du jour",
+        "RECENT_PATIENTS": "Patients récents",
+        "SEE_ALL": "Voir tous →",
+        "QUICK_ACCESS": "Accès rapides",
+        "NEW_APPT": "Nouveau RDV",
+        "NEW_NOTE": "Nouvelle note médicale",
+        "NEW_PRESCRIPTION": "Nouvelle prescription"
+      },
+      "COLUMNS": {
+        "PATIENT": "Patient",
+        "REGION": "Région",
+        "STATUS": "Statut"
+      },
+      "APPT_MODAL": {
+        "TITLE": "Nouveau rendez-vous",
+        "SUBMIT": "Créer",
+        "TYPE_LABEL": "Type *",
+        "DURATION_LABEL": "Durée (min) *",
+        "DATE_LABEL": "Date et heure *",
+        "LOCATION_LABEL": "Lieu",
+        "LOCATION_PLACEHOLDER": "Cabinet, domicile…",
+        "ERROR_GENERIC": "Une erreur est survenue. Veuillez réessayer."
+      },
+      "NOTE_MODAL": {
+        "TITLE": "Nouvelle note médicale",
+        "SUBMIT": "Enregistrer",
+        "CONTENT_LABEL": "Note médicale *",
+        "CONTENT_PLACEHOLDER": "Observations, diagnostic, plan de traitement…",
+        "CONTENT_MIN_LENGTH": "Minimum 10 caractères.",
+        "ERROR_GENERIC": "Une erreur est survenue. Veuillez réessayer."
+      },
+      "MED_MODAL": {
+        "TITLE": "Nouvelle prescription",
+        "SUBMIT": "Prescrire",
+        "NAME_LABEL": "Médicament *",
+        "NAME_PLACEHOLDER": "Ex. Paracétamol 500mg",
+        "DOSAGE_LABEL": "Dosage *",
+        "DOSAGE_PLACEHOLDER": "Ex. 1 comprimé",
+        "FREQUENCY_LABEL": "Fréquence *",
+        "START_DATE_LABEL": "Date de début *",
+        "END_DATE_LABEL": "Date de fin",
+        "NOTES_LABEL": "Notes",
+        "NOTES_PLACEHOLDER": "Instructions particulières…",
+        "ERROR_GENERIC": "Une erreur est survenue. Veuillez réessayer."
+      },
+      "APPT_FORM": {
+        "TITLE": "Ajouter un rendez-vous",
+        "SUBTITLE": "Planifier un rendez-vous pour ce patient",
+        "TYPE_LABEL": "Type de rendez-vous *",
+        "DATE_LABEL": "Date et heure *",
+        "DATE_REQUIRED": "Date requise.",
+        "DURATION_LABEL": "Durée (minutes) *",
+        "DURATION_MIN": "Durée minimum 5 minutes.",
+        "LOCATION_LABEL": "Lieu",
+        "LOCATION_PLACEHOLDER": "Ex: Cabinet Médical Central, Yaoundé",
+        "NOTES_LABEL": "Notes",
+        "NOTES_PLACEHOLDER": "Instructions ou informations complémentaires…",
+        "CANCEL": "Annuler",
+        "SUBMIT_LOADING": "Enregistrement…",
+        "SUBMIT": "Créer le rendez-vous",
+        "ERROR": "Erreur lors de la création du rendez-vous. Réessayez."
+      },
+      "NOTE_FORM": {
+        "TITLE": "Ajouter une note médicale",
+        "SUBTITLE": "La note sera attachée au dossier du patient",
+        "CONTENT_LABEL": "Contenu de la note *",
+        "CONTENT_PLACEHOLDER": "Observations cliniques, résultats, recommandations…",
+        "CONTENT_MIN_LENGTH": "Minimum 10 caractères requis.",
+        "CANCEL": "Annuler",
+        "SUBMIT_LOADING": "Enregistrement…",
+        "SUBMIT": "Enregistrer la note",
+        "ERROR": "Erreur lors de l'enregistrement. Réessayez."
+      },
+      "MED_FORM": {
+        "TITLE": "Prescrire un médicament",
+        "SUBTITLE": "Nouveau traitement pour ce patient",
+        "NAME_LABEL": "Médicament *",
+        "NAME_PLACEHOLDER": "Ex: Metformine",
+        "DOSAGE_LABEL": "Dosage *",
+        "DOSAGE_PLACEHOLDER": "Ex: 500mg",
+        "FREQUENCY_LABEL": "Fréquence *",
+        "START_DATE_LABEL": "Date de début *",
+        "END_DATE_LABEL": "Date de fin",
+        "NOTES_LABEL": "Notes",
+        "NOTES_PLACEHOLDER": "Instructions particulières…",
+        "CANCEL": "Annuler",
+        "SUBMIT_LOADING": "Enregistrement…",
+        "SUBMIT": "Prescrire",
+        "ERROR": "Erreur lors de la prescription. Réessayez."
+      },
+      "PATIENT_LIST": {
+        "TITLE": "Patients",
+        "SUBTITLE_SINGULAR": "{{ total }} patient enregistré",
+        "SUBTITLE_PLURAL": "{{ total }} patients enregistrés",
+        "SEARCH_PLACEHOLDER": "Rechercher par nom, email ou région…",
+        "COL_PATIENT": "Patient",
+        "COL_EMAIL": "Email",
+        "COL_REGION": "Région",
+        "COL_STATUS": "Statut",
+        "VIEW": "Voir",
+        "EMPTY": "Aucun patient trouvé.",
+        "PAGE_INFO": "Page {{ page }} sur {{ total }}",
+        "PREV": "Précédent",
+        "NEXT": "Suivant"
+      },
+      "PATIENT_DETAIL": {
+        "BACK": "Retour aux patients",
+        "ADHERENCE_LABEL": "Adhérence",
+        "TAB_RECORD": "Dossier médical",
+        "TAB_MEDICATIONS": "Traitements",
+        "TAB_APPOINTMENTS": "Rendez-vous",
+        "TAB_NOTES": "Notes",
+        "BLOOD_TYPE": "Groupe sanguin",
+        "ALLERGIES": "Allergies",
+        "NO_ALLERGIES": "Aucune allergie connue",
+        "CHRONIC_DISEASES": "Maladies chroniques",
+        "NO_CHRONIC": "Aucune maladie chronique enregistrée",
+        "NO_RECORD": "Aucun dossier médical disponible.",
+        "PRESCRIBE": "Prescrire",
+        "NO_MEDICATIONS": "Aucun traitement enregistré.",
+        "ADD_APPT": "Ajouter un RDV",
+        "NO_APPOINTMENTS": "Aucun rendez-vous enregistré.",
+        "ADD_NOTE": "Ajouter une note",
+        "NO_NOTES": "Aucune note médicale.",
+        "DURATION_MIN": "{{ duration }} min"
+      }
+    },
+    "ADMIN": {
+      "DASHBOARD": {
+        "SUBTITLE": "Gérez votre plateforme",
+        "IMAGE_ALT": "Tableau de bord administrateur",
+        "STAT_USERS": "Utilisateurs",
+        "STAT_PATIENTS": "Patients",
+        "STAT_EMPLOYEES": "Employés",
+        "STAT_CAMPAIGNS": "Campagnes",
+        "RECENT_USERS": "Derniers utilisateurs",
+        "SEE_ALL": "Voir tous →",
+        "QUICK_ACCESS": "Accès rapides",
+        "CREATE_USER": "Créer un utilisateur",
+        "MANAGE_CAMPAIGNS": "Gérer les campagnes"
+      },
+      "COLUMNS": {
+        "USER": "Utilisateur",
+        "EMAIL": "E-mail",
+        "ROLE": "Rôle",
+        "REGION": "Région",
+        "STATUS": "Statut"
+      },
+      "USER_MODAL": {
+        "TITLE_CREATE": "Créer un utilisateur",
+        "TITLE_EDIT": "Modifier l'utilisateur",
+        "SUBMIT": "Enregistrer",
+        "FIRST_NAME_LABEL": "Prénom *",
+        "FIRST_NAME_PLACEHOLDER": "Jean",
+        "LAST_NAME_LABEL": "Nom *",
+        "LAST_NAME_PLACEHOLDER": "Dupont",
+        "EMAIL_LABEL": "Adresse e-mail *",
+        "EMAIL_PLACEHOLDER": "jean.dupont@exemple.com",
+        "EMAIL_INVALID": "Adresse e-mail invalide.",
+        "PHONE_LABEL": "Téléphone",
+        "PHONE_PLACEHOLDER": "+33 6 00 00 00 00",
+        "REGION_LABEL": "Région",
+        "REGION_PLACEHOLDER": "Île-de-France",
+        "ROLE_LABEL": "Rôle *",
+        "STATUS_LABEL": "Statut",
+        "FIELD_REQUIRED": "Champ requis.",
+        "FETCH_ERROR": "Impossible de charger l'utilisateur.",
+        "SAVE_ERROR": "Une erreur est survenue. Veuillez réessayer."
+      },
+      "USER_FORM": {
+        "TITLE_CREATE": "Créer un utilisateur",
+        "TITLE_EDIT": "Modifier l'utilisateur",
+        "SUBTITLE_CREATE": "Nouveau compte sur la plateforme",
+        "SUBTITLE_EDIT": "Mettre à jour les informations du compte",
+        "FIRST_NAME_LABEL": "Prénom *",
+        "LAST_NAME_LABEL": "Nom *",
+        "EMAIL_LABEL": "Email *",
+        "EMAIL_PLACEHOLDER": "utilisateur@exemple.com",
+        "EMAIL_INVALID": "Email invalide.",
+        "PHONE_LABEL": "Téléphone",
+        "PHONE_PLACEHOLDER": "+237600000000",
+        "REGION_LABEL": "Région",
+        "REGION_PLACEHOLDER": "Ex : Yaoundé",
+        "ROLE_LABEL": "Rôle *",
+        "FIELD_REQUIRED": "Champ requis.",
+        "CANCEL": "Annuler",
+        "SUBMIT_LOADING": "Enregistrement…",
+        "SUBMIT_CREATE": "Créer le compte",
+        "SUBMIT_EDIT": "Mettre à jour",
+        "ERROR": "Erreur lors de l'enregistrement. Réessayez."
+      },
+      "USER_MGMT": {
+        "TITLE": "Utilisateurs",
+        "SUBTITLE_SINGULAR": "{{ count }} compte enregistré",
+        "SUBTITLE_PLURAL": "{{ count }} comptes enregistrés",
+        "CREATE_USER": "Créer un utilisateur",
+        "SEARCH_PLACEHOLDER": "Rechercher par nom ou e-mail",
+        "FILTER_ALL_ROLES": "Tous les rôles",
+        "FILTER_REGION_PLACEHOLDER": "Filtrer par région",
+        "DELETE_TITLE": "Supprimer {{ name }}",
+        "DELETE_MESSAGE": "Cette action est irréversible. L'utilisateur sera définitivement supprimé.",
+        "DELETE_CONFIRM": "Supprimer"
+      },
+      "CAMPAIGN_LIST": {
+        "TITLE": "Campagnes",
+        "SUBTITLE_SINGULAR": "{{ total }} campagne créée",
+        "SUBTITLE_PLURAL": "{{ total }} campagnes créées",
+        "NEW_CAMPAIGN": "+ Nouvelle campagne",
+        "TARGET_LABEL": "Cible :",
+        "REGION_LABEL": "Région :",
+        "RECIPIENTS_LABEL": "{{ count }} destinataires",
+        "SCHEDULED_LABEL": "Planifiée :",
+        "DELETE": "Supprimer",
+        "EMPTY": "Aucune campagne créée.",
+        "PAGE_INFO": "Page {{ page }} sur {{ total }}",
+        "PREV": "Précédent",
+        "NEXT": "Suivant",
+        "DELETE_CONFIRM": "Supprimer cette campagne ?"
+      },
+      "CAMPAIGN_FORM": {
+        "TITLE": "Nouvelle campagne",
+        "SUBTITLE": "Envoyer un message groupé aux patients",
+        "TITLE_LABEL": "Titre *",
+        "TITLE_PLACEHOLDER": "Ex : Rappel médicaments — Mai 2026",
+        "TITLE_REQUIRED": "Champ requis.",
+        "MESSAGE_LABEL": "Message *",
+        "MESSAGE_PLACEHOLDER": "Rédigez votre message ici…",
+        "MESSAGE_MIN_LENGTH": "Minimum 10 caractères.",
+        "TARGET_LABEL": "Cible *",
+        "TARGET_ALL": "Tous les patients",
+        "TARGET_REGION": "Par région",
+        "TARGET_ROLE": "Par rôle",
+        "REGION_LABEL": "Région",
+        "REGION_PLACEHOLDER": "Ex : Yaoundé, Douala",
+        "SCHEDULED_LABEL": "Date d'envoi planifiée",
+        "SCHEDULED_HINT": "optionnel, envoi immédiat sinon",
+        "CANCEL": "Annuler",
+        "SUBMIT_LOADING": "Création…",
+        "SUBMIT": "Créer la campagne",
+        "ERROR": "Erreur lors de la création. Réessayez."
       }
     }
   }

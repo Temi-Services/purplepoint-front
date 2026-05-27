@@ -1,8 +1,8 @@
 <!-- src/app/features/medical/modals/medication-form-modal.component.html -->
 <pp-modal
-  title="Nouvelle prescription"
+  [title]="'MEDICAL.MED_MODAL.TITLE' | translate"
   size="lg"
-  submitLabel="Prescrire"
+  [submitLabel]="'MEDICAL.MED_MODAL.SUBMIT' | translate"
   [loading]="isLoading()"
   [submitDisabled]="form.invalid"
   (closed)="closed.emit()"
@@ -15,7 +15,6 @@
   }
 
   <form [formGroup]="form" class="grid grid-cols-1 sm:grid-cols-2 gap-4" (ngSubmit)="onSubmit()">
-
     @if (!patientId()) {
       <div class="sm:col-span-2">
         <pp-patient-search
@@ -27,23 +26,25 @@
 
     <div class="sm:col-span-2">
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Médicament <span class="text-danger">*</span>
+        {{ 'MEDICAL.MED_MODAL.NAME_LABEL' | translate }}
       </label>
       <input type="text" formControlName="name"
-             placeholder="Ex. Paracétamol 500mg" class="input" />
+             [placeholder]="'MEDICAL.MED_MODAL.NAME_PLACEHOLDER' | translate"
+             class="input" />
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Dosage <span class="text-danger">*</span>
+        {{ 'MEDICAL.MED_MODAL.DOSAGE_LABEL' | translate }}
       </label>
       <input type="text" formControlName="dosage"
-             placeholder="Ex. 1 comprimé" class="input" />
+             [placeholder]="'MEDICAL.MED_MODAL.DOSAGE_PLACEHOLDER' | translate"
+             class="input" />
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Fréquence <span class="text-danger">*</span>
+        {{ 'MEDICAL.MED_MODAL.FREQUENCY_LABEL' | translate }}
       </label>
       <select formControlName="frequency" class="input">
         @for (f of frequencies; track f) {
@@ -54,26 +55,25 @@
 
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Date de début <span class="text-danger">*</span>
+        {{ 'MEDICAL.MED_MODAL.START_DATE_LABEL' | translate }}
       </label>
       <input type="date" formControlName="startDate" class="input" />
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Date de fin
+        {{ 'MEDICAL.MED_MODAL.END_DATE_LABEL' | translate }}
       </label>
       <input type="date" formControlName="endDate" class="input" />
     </div>
 
     <div class="sm:col-span-2">
       <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Notes
+        {{ 'MEDICAL.MED_MODAL.NOTES_LABEL' | translate }}
       </label>
       <textarea formControlName="notes" rows="3"
-                placeholder="Instructions particulières…"
+                [placeholder]="'MEDICAL.MED_MODAL.NOTES_PLACEHOLDER' | translate"
                 class="input resize-none"></textarea>
     </div>
-
   </form>
 </pp-modal>

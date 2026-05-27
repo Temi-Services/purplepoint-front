@@ -1,8 +1,8 @@
+<!-- src/app/features/admin/pages/campaign-form/campaign-form.component.html -->
 <div class="max-w-2xl mx-auto px-4 py-8">
-
   <div class="mb-6">
-    <h1 class="text-2xl font-semibold text-gray-900">New Campaign</h1>
-    <p class="text-sm text-muted mt-1">Send a bulk message to patients</p>
+    <h1 class="text-2xl font-semibold text-gray-900">{{ 'ADMIN.CAMPAIGN_FORM.TITLE' | translate }}</h1>
+    <p class="text-sm text-muted mt-1">{{ 'ADMIN.CAMPAIGN_FORM.SUBTITLE' | translate }}</p>
   </div>
 
   @if (error()) {
@@ -15,30 +15,36 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Title *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ 'ADMIN.CAMPAIGN_FORM.TITLE_LABEL' | translate }}
+        </label>
         <input type="text" formControlName="title"
-               placeholder="Ex: Medication reminder – May 2026"
+               [placeholder]="'ADMIN.CAMPAIGN_FORM.TITLE_PLACEHOLDER' | translate"
                class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"/>
+                      focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
         @if (form.controls.title.invalid && form.controls.title.touched) {
-          <p class="mt-1 text-xs text-red-600">Required field.</p>
+          <p class="mt-1 text-xs text-red-600">{{ 'ADMIN.CAMPAIGN_FORM.TITLE_REQUIRED' | translate }}</p>
         }
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Message *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ 'ADMIN.CAMPAIGN_FORM.MESSAGE_LABEL' | translate }}
+        </label>
         <textarea formControlName="message" rows="5"
-                  placeholder="Write your message here…"
+                  [placeholder]="'ADMIN.CAMPAIGN_FORM.MESSAGE_PLACEHOLDER' | translate"
                   class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none">
+                         focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none">
         </textarea>
         @if (form.controls.message.invalid && form.controls.message.touched) {
-          <p class="mt-1 text-xs text-red-600">Minimum 10 characters.</p>
+          <p class="mt-1 text-xs text-red-600">{{ 'ADMIN.CAMPAIGN_FORM.MESSAGE_MIN_LENGTH' | translate }}</p>
         }
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Target *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ 'ADMIN.CAMPAIGN_FORM.TARGET_LABEL' | translate }}
+        </label>
         <div class="grid grid-cols-3 gap-2">
           @for (t of targets; track t.value) {
             <label
@@ -48,9 +54,8 @@
                 ? 'border-primary bg-primary-light text-primary'
                 : 'border-border hover:bg-surface-2 text-gray-700'"
             >
-              <input type="radio" formControlName="target"
-                     [value]="t.value" class="hidden"/>
-              {{ t.label }}
+              <input type="radio" formControlName="target" [value]="t.value" class="hidden" />
+              {{ t.labelKey | translate }}
             </label>
           }
         </div>
@@ -58,34 +63,38 @@
 
       @if (showRegion()) {
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Region</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            {{ 'ADMIN.CAMPAIGN_FORM.REGION_LABEL' | translate }}
+          </label>
           <input type="text" formControlName="region"
-                 placeholder="Ex: Yaounde, Douala…"
+                 [placeholder]="'ADMIN.CAMPAIGN_FORM.REGION_PLACEHOLDER' | translate"
                  class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"/>
+                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
         </div>
       }
 
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 mb-1.5">
-          Scheduled send date
-          <span class="text-muted font-normal ml-1">— optional, immediate send otherwise</span>
+          {{ 'ADMIN.CAMPAIGN_FORM.SCHEDULED_LABEL' | translate }}
+          <span class="text-muted font-normal ml-1">
+            ({{ 'ADMIN.CAMPAIGN_FORM.SCHEDULED_HINT' | translate }})
+          </span>
         </label>
         <input type="datetime-local" formControlName="scheduledAt"
                class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"/>
+                      focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
       </div>
 
       <div class="flex items-center justify-end gap-3">
         <button type="button" (click)="cancel()"
                 class="px-4 py-2 text-sm font-medium text-muted rounded-md border border-border
-                 hover:bg-surface-2 transition-colors">
-          Cancel
+                       hover:bg-surface-2 transition-colors">
+          {{ 'ADMIN.CAMPAIGN_FORM.CANCEL' | translate }}
         </button>
         <button type="submit" [disabled]="isLoading() || form.invalid"
                 class="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary
-                 hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
-          {{ isLoading() ? 'Creating…' : 'Create campaign' }}
+                       hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
+          {{ (isLoading() ? 'ADMIN.CAMPAIGN_FORM.SUBMIT_LOADING' : 'ADMIN.CAMPAIGN_FORM.SUBMIT') | translate }}
         </button>
       </div>
 

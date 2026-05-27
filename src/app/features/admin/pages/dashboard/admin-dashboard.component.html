@@ -1,16 +1,11 @@
-<!-- Modales -->
+<!-- src/app/features/admin/pages/dashboard/admin-dashboard.component.html -->
 @if (showUserForm()) {
-  <pp-user-form-modal
-    (saved)="onUserSaved()"
-    (closed)="closeForm()"
-  />
+  <pp-user-form-modal (saved)="onUserSaved()" (closed)="closeForm()" />
 }
 
-<!-- Templates colonnes DataTable -->
 <ng-template #nameCell let-user>
   <div class="flex items-center gap-2.5">
-    <div class="w-7 h-7 rounded-full bg-primary-light flex items-center
-                justify-center flex-shrink-0">
+    <div class="w-7 h-7 rounded-full bg-primary-light flex items-center justify-center flex-shrink-0">
       <span class="text-xs font-semibold text-primary">
         {{ user.firstName[0] }}{{ user.lastName[0] }}
       </span>
@@ -20,25 +15,21 @@
     </span>
   </div>
 </ng-template>
-
 <ng-template #roleCell   let-user><pp-badge [value]="user.role"   /></ng-template>
 <ng-template #statusCell let-user><pp-badge [value]="user.status" /></ng-template>
 
-<!-- Page -->
 <div class="flex flex-col gap-6">
 
-  <!-- WelcomeCard -->
   <pp-welcome-card
     [userName]="userName()"
-    subtitle="Gérez votre plateforme"
+    [subtitle]="'ADMIN.DASHBOARD.SUBTITLE' | translate"
     imageUrl="https://storyset.com/illustration/online-doctor/rafiki"
-    imageAlt="Tableau de bord administrateur"
+    [imageAlt]="'ADMIN.DASHBOARD.IMAGE_ALT' | translate"
   />
 
-  <!-- StatCards -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <pp-stat-card
-      label="Utilisateurs"
+      [label]="'ADMIN.DASHBOARD.STAT_USERS' | translate"
       [value]="totalUsers()"
       icon="ti-users"
       color="primary"
@@ -46,21 +37,21 @@
       routerLink="/admin/users"
     />
     <pp-stat-card
-      label="Patients"
+      [label]="'ADMIN.DASHBOARD.STAT_PATIENTS' | translate"
       [value]="totalPatients()"
       icon="ti-user-heart"
       color="info"
       [loading]="statsLoading()"
     />
     <pp-stat-card
-      label="Employés"
+      [label]="'ADMIN.DASHBOARD.STAT_EMPLOYEES' | translate"
       [value]="totalEmployees()"
       icon="ti-user-check"
       color="success"
       [loading]="statsLoading()"
     />
     <pp-stat-card
-      label="Campagnes"
+      [label]="'ADMIN.DASHBOARD.STAT_CAMPAIGNS' | translate"
       [value]="totalCampaigns()"
       icon="ti-speakerphone"
       color="warning"
@@ -69,21 +60,16 @@
     />
   </div>
 
-  <!-- Grille principale -->
   <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
-    <!-- Section principale : derniers utilisateurs (60%) -->
     <div class="lg:col-span-3 flex flex-col gap-3">
       <div class="flex items-center justify-between">
         <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-          Derniers utilisateurs
+          {{ 'ADMIN.DASHBOARD.RECENT_USERS' | translate }}
         </h2>
-        <a routerLink="/admin/users"
-           class="text-sm text-primary hover:underline font-medium">
-          Voir tous →
+        <a routerLink="/admin/users" class="text-sm text-primary hover:underline font-medium">
+          {{ 'ADMIN.DASHBOARD.SEE_ALL' | translate }}
         </a>
       </div>
-
       <pp-data-table
         [columns]="columns()"
         [data]="recentUsers()"
@@ -93,25 +79,22 @@
       />
     </div>
 
-    <!-- Accès rapides (40%) -->
     <div class="lg:col-span-2 flex flex-col gap-3">
       <h2 class="text-base font-semibold text-gray-900 dark:text-gray-100">
-        Accès rapides
+        {{ 'ADMIN.DASHBOARD.QUICK_ACCESS' | translate }}
       </h2>
-
       <div class="card p-5 flex flex-col gap-3">
         <button type="button" (click)="openCreate()" class="btn-primary w-full justify-center">
           <i class="ti ti-user-plus" aria-hidden="true"></i>
-          Créer un utilisateur
+          {{ 'ADMIN.DASHBOARD.CREATE_USER' | translate }}
         </button>
-
         <a routerLink="/admin/campaigns"
            class="btn-ghost w-full justify-center border border-border rounded-lg">
           <i class="ti ti-speakerphone" aria-hidden="true"></i>
-          Gérer les campagnes
+          {{ 'ADMIN.DASHBOARD.MANAGE_CAMPAIGNS' | translate }}
         </a>
       </div>
     </div>
-
   </div>
+
 </div>

@@ -1,22 +1,14 @@
 // src/app/features/admin/pages/user-management/user-management.component.ts
-import {
-  Component,
-  inject,
-  signal,
-  computed,
-  TemplateRef,
-  viewChild,
-} from '@angular/core';
+import { Component, inject, signal, computed, TemplateRef, viewChild } from '@angular/core';
 import { httpResource } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { LabelPipe } from '../../../../core/pipes/label.pipe';
 import { environment } from '../../../../../environments/environment';
 import { AdminUserService } from '../../services/admin-user.service';
 import { User } from '../../../../core/models/user.model';
 import { UserRole } from '../../../../core/models/roles.enum';
-import {
-  DataTableComponent,
-  TableColumn,
-} from '../../../../shared/components/data-table/data-table.component';
+import { DataTableComponent, TableColumn } from '../../../../shared/components/data-table/data-table.component';
 import { BadgeComponent } from '../../../../shared/components/badge/badge.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { UserFormModalComponent } from '../../modals/user-form-modal.component';
@@ -27,16 +19,15 @@ const ROLES = Object.values(UserRole);
 @Component({
   selector: 'pp-user-management',
   imports: [
-    FormsModule,
-    DataTableComponent,
-    BadgeComponent,
-    ConfirmDialogComponent,
-    UserFormModalComponent,
+    FormsModule, TranslateModule, LabelPipe,
+    DataTableComponent, BadgeComponent,
+    ConfirmDialogComponent, UserFormModalComponent,
   ],
   templateUrl: './user-management.component.html',
 })
 export class UserManagementComponent {
   private readonly userService = inject(AdminUserService);
+  private readonly translate   = inject(TranslateService);
 
   readonly filterRole   = signal<UserRole | ''>('');
   readonly filterRegion = signal('');
@@ -72,6 +63,14 @@ export class UserManagementComponent {
     return q ? this.filteredUsers().length : this.allTotal();
   });
 
+  readonly subtitleLabel = computed(() => {
+    const count = this.filteredTotal();
+    const key = count <= 1
+      ? 'ADMIN.USER_MGMT.SUBTITLE_SINGULAR'
+      : 'ADMIN.USER_MGMT.SUBTITLE_PLURAL';
+    return this.translate.instant(key, { count });
+  });
+
   readonly loading = computed(() => this.usersResource.isLoading());
 
   readonly showUserForm  = signal(false);
@@ -80,41 +79,31 @@ export class UserManagementComponent {
   readonly deleteTarget  = signal<User | null>(null);
   readonly deleteLoading = signal(false);
 
+  readonly deleteTitle = computed(() => {
+    const u = this.deleteTarget();
+    if (!u) return '';
+    return this.translate.instant('ADMIN.USER_MGMT.DELETE_TITLE', {
+      name: `${u.firstName} ${u.lastName}`,
+    });
+  });
+
   readonly roleCell   = viewChild<TemplateRef<{ $implicit: User }>>('roleCell');
   readonly statusCell = viewChild<TemplateRef<{ $implicit: User }>>('statusCell');
   readonly nameCell   = viewChild<TemplateRef<{ $implicit: User }>>('nameCell');
 
   readonly columns = computed<TableColumn<User>[]>(() => [
-    { key: 'firstName', label: 'Utilisateur', template: this.nameCell() },
-    { key: 'email',     label: 'E-mail' },
-    { key: 'role',      label: 'Rôle',    template: this.roleCell() },
-    { key: 'region',    label: 'Région' },
-    { key: 'status',    label: 'Statut',  template: this.statusCell() },
+    { key: 'firstName', label: this.translate.instant('ADMIN.COLUMNS.USER'),   template: this.nameCell() },
+    { key: 'email',     label: this.translate.instant('ADMIN.COLUMNS.EMAIL') },
+    { key: 'role',      label: this.translate.instant('ADMIN.COLUMNS.ROLE'),   template: this.roleCell() },
+    { key: 'region',    label: this.translate.instant('ADMIN.COLUMNS.REGION') },
+    { key: 'status',    label: this.translate.instant('ADMIN.COLUMNS.STATUS'), template: this.statusCell() },
   ]);
 
-  openCreate(): void {
-    this.editUserId.set(undefined);
-    this.showUserForm.set(true);
-  }
-
-  openEdit(user: User): void {
-    this.editUserId.set(user.id);
-    this.showUserForm.set(true);
-  }
-
-  openDelete(user: User): void {
-    this.deleteTarget.set(user);
-    this.showConfirm.set(true);
-  }
-
-  closeForm(): void {
-    this.showUserForm.set(false);
-    this.editUserId.set(undefined);
-  }
-
-  onSaved(): void {
-    this.usersResource.reload();
-  }
+  openCreate(): void { this.editUserId.set(undefined); this.showUserForm.set(true); }
+  openEdit(user: User): void { this.editUserId.set(user.id); this.showUserForm.set(true); }
+  openDelete(user: User): void { this.deleteTarget.set(user); this.showConfirm.set(true); }
+  closeForm(): void { this.showUserForm.set(false); this.editUserId.set(undefined); }
+  onSaved(): void { this.usersResource.reload(); }
 
   async confirmDelete(): Promise<void> {
     const user = this.deleteTarget();
@@ -129,26 +118,9 @@ export class UserManagementComponent {
     }
   }
 
-  cancelDelete(): void {
-    this.showConfirm.set(false);
-    this.deleteTarget.set(null);
-  }
-
-  onRoleFilter(role: UserRole | ''): void {
-    this.filterRole.set(role);
-    this.page.set(1);
-  }
-
-  onRegionFilter(region: string): void {
-    this.filterRegion.set(region);
-    this.page.set(1);
-  }
-
-  onNameFilter(name: string): void {
-    this.filterName.set(name);
-  }
-
-  onPageChange(p: number): void {
-    this.page.set(p);
-  }
+  cancelDelete(): void { this.showConfirm.set(false); this.deleteTarget.set(null); }
+  onRoleFilter(role: UserRole | ''): void { this.filterRole.set(role); this.page.set(1); }
+  onRegionFilter(region: string): void { this.filterRegion.set(region); this.page.set(1); }
+  onNameFilter(name: string): void { this.filterName.set(name); }
+  onPageChange(p: number): void { this.page.set(p); }
 }

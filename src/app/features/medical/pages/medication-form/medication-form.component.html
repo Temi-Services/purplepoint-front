@@ -1,7 +1,8 @@
+<!-- src/app/features/medical/pages/medication-form/medication-form.component.html -->
 <div class="max-w-2xl mx-auto px-4 py-8">
   <div class="mb-6">
-    <h1 class="text-2xl font-semibold text-gray-900">Prescrire un médicament</h1>
-    <p class="text-sm text-muted mt-1">Nouveau traitement pour ce patient</p>
+    <h1 class="text-2xl font-semibold text-gray-900">{{ 'MEDICAL.MED_FORM.TITLE' | translate }}</h1>
+    <p class="text-sm text-muted mt-1">{{ 'MEDICAL.MED_FORM.SUBTITLE' | translate }}</p>
   </div>
 
   @if (error()) {
@@ -15,88 +16,78 @@
 
       <div class="grid sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Médicament *</label>
-          <input
-            type="text"
-            formControlName="name"
-            placeholder="Ex: Metformine"
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            {{ 'MEDICAL.MED_FORM.NAME_LABEL' | translate }}
+          </label>
+          <input type="text" formControlName="name"
+            [placeholder]="'MEDICAL.MED_FORM.NAME_PLACEHOLDER' | translate"
             class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Dosage *</label>
-          <input
-            type="text"
-            formControlName="dosage"
-            placeholder="Ex: 500mg"
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            {{ 'MEDICAL.MED_FORM.DOSAGE_LABEL' | translate }}
+          </label>
+          <input type="text" formControlName="dosage"
+            [placeholder]="'MEDICAL.MED_FORM.DOSAGE_PLACEHOLDER' | translate"
             class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
         </div>
       </div>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Fréquence *</label>
-        <select
-          formControlName="frequency"
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ 'MEDICAL.MED_FORM.FREQUENCY_LABEL' | translate }}
+        </label>
+        <select formControlName="frequency"
           class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-        >
+                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
           @for (f of frequencies; track f.value) {
-            <option [value]="f.value">{{ f.label }}</option>
+            <option [value]="f.value">{{ f.labelKey | translate }}</option>
           }
         </select>
       </div>
 
       <div class="grid sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Date de début *</label>
-          <input
-            type="date"
-            formControlName="startDate"
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            {{ 'MEDICAL.MED_FORM.START_DATE_LABEL' | translate }}
+          </label>
+          <input type="date" formControlName="startDate"
             class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Date de fin</label>
-          <input
-            type="date"
-            formControlName="endDate"
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            {{ 'MEDICAL.MED_FORM.END_DATE_LABEL' | translate }}
+          </label>
+          <input type="date" formControlName="endDate"
             class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" />
         </div>
       </div>
 
       <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1.5">Notes</label>
-        <textarea
-          formControlName="notes"
-          rows="3"
-          placeholder="Instructions particulières…"
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          {{ 'MEDICAL.MED_FORM.NOTES_LABEL' | translate }}
+        </label>
+        <textarea formControlName="notes" rows="3"
+          [placeholder]="'MEDICAL.MED_FORM.NOTES_PLACEHOLDER' | translate"
           class="w-full px-3 py-2 rounded-md border border-border bg-surface text-sm
-                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-        ></textarea>
+                 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none">
+        </textarea>
       </div>
 
       <div class="flex items-center justify-end gap-3">
-        <button
-          type="button"
-          (click)="cancel()"
+        <button type="button" (click)="cancel()"
           class="px-4 py-2 text-sm font-medium text-muted rounded-md border border-border
-                 hover:bg-surface-2 transition-colors"
-        >
-          Annuler
+                 hover:bg-surface-2 transition-colors">
+          {{ 'MEDICAL.MED_FORM.CANCEL' | translate }}
         </button>
-        <button
-          type="submit"
-          [disabled]="isLoading() || form.invalid"
+        <button type="submit" [disabled]="isLoading() || form.invalid"
           class="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary
-                 hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-        >
-          {{ isLoading() ? 'Enregistrement…' : 'Prescrire' }}
+                 hover:bg-primary-hover disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
+          {{ (isLoading() ? 'MEDICAL.MED_FORM.SUBMIT_LOADING' : 'MEDICAL.MED_FORM.SUBMIT') | translate }}
         </button>
       </div>
 
