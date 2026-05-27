@@ -577,5 +577,6 @@
       "SUBMIT": "Create campaign",
       "ERROR": "Error during creation. Please try again."
     }
-  }
+  },
+  "SWITCH_LANG": "Switch language"
 }

@@ -1,8 +1,8 @@
-// src/app/shared/components/topbar/topbar.component.ts
 import { Component, input, output, computed, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { ThemeService } from '../../../core/services/theme.service';
+import { LanguageService, AppLocale } from '../../../core/services/language.service';
 import { User } from '../../../core/models/user.model';
 
 @Component({
@@ -29,7 +29,8 @@ import { User } from '../../../core/models/user.model';
       <div class="flex-1 min-w-0"></div>
 
       <div class="flex items-center gap-1">
-        <!-- Dark / light toggle -->
+
+        <!-- Toggle dark / light -->
         <button
           type="button"
           (click)="theme.toggle()"
@@ -38,6 +39,18 @@ import { User } from '../../../core/models/user.model';
           [attr.aria-label]="(theme.isDark() ? 'SHARED.TOPBAR.LIGHT_MODE' : 'SHARED.TOPBAR.DARK_MODE') | translate"
         >
           <i [class]="'ti ' + theme.iconClass() + ' text-xl'" aria-hidden="true"></i>
+        </button>
+
+        <!-- Toggle langue EN / FR -->
+        <button
+          type="button"
+          (click)="toggleLocale()"
+          class="h-8 px-2.5 rounded-lg text-xs font-semibold border transition-colors
+                 border-border text-muted hover:bg-surface-2 hover:text-gray-900
+                 dark:hover:text-gray-100 tracking-wide"
+          [attr.aria-label]="'SHARED.TOPBAR.SWITCH_LANG' | translate"
+        >
+          {{ lang.locale() === 'fr' ? 'EN' : 'FR' }}
         </button>
 
         <!-- Notifications -->
@@ -78,12 +91,14 @@ import { User } from '../../../core/models/user.model';
         >
           <i class="ti ti-logout text-xl" aria-hidden="true"></i>
         </button>
+
       </div>
     </header>
   `,
 })
 export class TopbarComponent {
   readonly theme = inject(ThemeService);
+  readonly lang  = inject(LanguageService);
 
   readonly user            = input.required<User>();
   readonly sidebarExpanded = input<boolean>(true);
@@ -106,4 +121,8 @@ export class TopbarComponent {
     if (this.sidebarExpanded()) return 'left-0 md:left-16 lg:left-60';
     return 'left-0 md:left-16';
   });
+
+  toggleLocale(): void {
+    this.lang.setLocale(this.lang.locale() === 'fr' ? 'en' : 'fr');
+  }
 }
