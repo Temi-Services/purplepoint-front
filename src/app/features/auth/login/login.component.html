@@ -3,6 +3,10 @@
   <pp-new-password-modal />
 }
 
+@if (showForgotPassword()) {
+  <pp-forgot-password-modal (closed)="showForgotPassword.set(false)" />
+}
+
 <div class="min-h-screen flex">
 
   <!-- Left panel (hidden on mobile) -->
@@ -137,6 +141,12 @@
         </button>
 
       </form>
+
+      <button type="button" (click)="showForgotPassword.set(true)"
+              class="text-sm text-primary hover:underline">
+        {{ 'AUTH.FORGOT_PASSWORD.LINK' | translate }}
+      </button>
+
     </div>
   </div>
 </div>

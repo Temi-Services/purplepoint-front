@@ -102,6 +102,18 @@ export class AuthService {
     }
   }
 
+  async forgotPassword(email: string): Promise<void> {
+    await firstValueFrom(
+      this.http.post(`${this.baseUrl}/forgot-password`, { email }),
+    );
+  }
+
+  async confirmForgotPassword(email: string, code: string, newPassword: string): Promise<void> {
+    await firstValueFrom(
+      this.http.post(`${this.baseUrl}/forgot-password/confirm`, { email, code, newPassword }),
+    );
+  }
+
   restoreSession(): void {
     const accessToken = localStorage.getItem('pp_access_token');
     const idToken     = localStorage.getItem('pp_id_token');

@@ -5,26 +5,34 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/auth/auth.service';
 import { NewPasswordModalComponent } from '../new-password/new-password-modal.component';
+import { ForgotPasswordModalComponent } from '../forgot-password-modal/forgot-password-modal.component';
 
 @Component({
   selector: 'pp-login',
-  imports: [ReactiveFormsModule, NewPasswordModalComponent, TranslateModule],
+  imports: [
+    ReactiveFormsModule,
+    NewPasswordModalComponent,
+    TranslateModule,
+    ForgotPasswordModalComponent,
+  ],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
-  private readonly fb        = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
   private readonly translate = inject(TranslateService);
   readonly auth = inject(AuthService);
 
-  readonly isLoading        = this.auth.isLoading;
+  readonly isLoading = this.auth.isLoading;
   readonly challengePending = this.auth.challengePending;
-  readonly error            = signal<string | null>(null);
-  readonly showPassword     = signal(false);
-  readonly currentYear      = new Date().getFullYear();
+  readonly error = signal<string | null>(null);
+  readonly showPassword = signal(false);
+  readonly currentYear = new Date().getFullYear();
+
+  showForgotPassword = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     identifier: ['', [Validators.required]],
-    password:   ['', [Validators.required, Validators.minLength(8)]],
+    password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   async onSubmit(): Promise<void> {

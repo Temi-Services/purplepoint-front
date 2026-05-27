@@ -28,6 +28,26 @@
       "CONFIRM_PASSWORD_PLACEHOLDER": "Répétez le mot de passe",
       "PASSWORD_MISMATCH": "Les mots de passe ne correspondent pas.",
       "SUBMIT": "Confirmer"
+    },
+    "FORGOT_PASSWORD": {
+      "LINK": "Mot de passe oublié ?",
+      "TITLE_EMAIL":              "Mot de passe oublié",
+      "TITLE_CONFIRM":            "Vérification",
+      "INTRO_EMAIL":              "Entrez votre adresse email pour recevoir un code de réinitialisation.",
+      "INTRO_CONFIRM":            "Un code a été envoyé à {{ email }}. Vérifiez vos emails.",
+      "EMAIL_LABEL":              "Adresse email",
+      "EMAIL_PLACEHOLDER":        "vous@exemple.com",
+      "EMAIL_REQUIRED":           "L'email est requis.",
+      "EMAIL_INVALID":            "Adresse email invalide.",
+      "SUBMIT_EMAIL":             "Envoyer le code",
+      "CODE_LABEL":               "Code de vérification",
+      "CODE_PLACEHOLDER":         "123456",
+      "CODE_REQUIRED":            "Le code est requis.",
+      "NEW_PASSWORD_LABEL":       "Nouveau mot de passe",
+      "NEW_PASSWORD_PLACEHOLDER": "8 caractères minimum",
+      "NEW_PASSWORD_MIN_LENGTH":  "Le mot de passe doit contenir au moins 8 caractères.",
+      "SUBMIT_CONFIRM":           "Réinitialiser",
+      "BACK":                     "Retour"
     }
   },
   "SHARED": {
@@ -574,5 +594,6 @@
       "SUBMIT": "Créer la campagne",
       "ERROR": "Erreur lors de la création. Réessayez."
     }
-  }
+  },
+  "SWITCH_LANG": "changer de langue"
 }

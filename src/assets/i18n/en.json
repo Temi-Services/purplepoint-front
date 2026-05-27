@@ -28,6 +28,27 @@
       "CONFIRM_PASSWORD_PLACEHOLDER": "Repeat the password",
       "PASSWORD_MISMATCH": "Passwords do not match.",
       "SUBMIT": "Confirm"
+    },
+    "FORGOT_PASSWORD": {
+      "LINK": "Forgot password ?",
+      "TITLE_EMAIL":              "Forgot password",
+      "TITLE_CONFIRM":            "Verification",
+      "INTRO_EMAIL":              "Enter your email address to receive a password reset code.",
+      "INTRO_CONFIRM":            "A code has been sent to {{ email }}. Check your emails.",
+      "EMAIL_LABEL":              "Email address",
+      "EMAIL_PLACEHOLDER":        "you@example.com",
+      "EMAIL_REQUIRED":           "Email is required.",
+      "EMAIL_INVALID":            "Invalid email address.",
+      "SUBMIT_EMAIL":             "Send code",
+      "CODE_LABEL":               "Verification code",
+      "CODE_PLACEHOLDER":         "123456",
+      "CODE_REQUIRED":            "Code is required.",
+      "NEW_PASSWORD_LABEL":       "New password",
+      "NEW_PASSWORD_PLACEHOLDER": "At least 8 characters",
+      "NEW_PASSWORD_MIN_LENGTH":  "Password must be at least 8 characters.",
+      "SUBMIT_CONFIRM":           "Reset password",
+      "BACK":                     "Back",
+      "LINK":                     "Forgot your password?"
     }
   },
   "SHARED": {
