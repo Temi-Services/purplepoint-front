@@ -47,8 +47,7 @@
       "NEW_PASSWORD_PLACEHOLDER": "At least 8 characters",
       "NEW_PASSWORD_MIN_LENGTH":  "Password must be at least 8 characters.",
       "SUBMIT_CONFIRM":           "Reset password",
-      "BACK":                     "Back",
-      "LINK":                     "Forgot your password?"
+      "BACK":                     "Back"
     }
   },
   "SHARED": {
