@@ -36,6 +36,9 @@ export class AuthService {
   private readonly _challengePending = signal<NewPasswordChallenge | null>(null);
   private readonly _initialized      = signal<boolean>(false);
 
+  /** Refresh en cours, partagé par les requêtes concurrentes qui reçoivent un 401. */
+  private refreshInFlight: Promise<string | null> | null = null;
+
   readonly currentUser      = this._currentUser.asReadonly();
   readonly token            = this._accessToken.asReadonly();
   readonly isLoading        = this._loading.asReadonly();
@@ -115,12 +118,15 @@ export class AuthService {
   }
 
   restoreSession(): void {
-    const accessToken = localStorage.getItem('pp_access_token');
-    const idToken     = localStorage.getItem('pp_id_token');
+    const accessToken  = localStorage.getItem('pp_access_token');
+    const idToken      = localStorage.getItem('pp_id_token');
+    const refreshToken = localStorage.getItem('pp_refresh_token');
     if (!accessToken) return;
     const accessPayload = decodeJwtPayload(accessToken);
     const exp           = accessPayload['exp'] as number | undefined;
-    if (exp && Date.now() / 1000 > exp) {
+    // Access token expiré sans refresh token : la session est perdue.
+    // Avec un refresh token, on restaure : le premier 401 déclenchera un refresh.
+    if (exp && Date.now() / 1000 > exp && !refreshToken) {
       this.clearSession();
       return;
     }
@@ -130,7 +136,43 @@ export class AuthService {
     this._accessToken.set(accessToken);
   }
 
+  /**
+   * Renouvelle la session avec le refresh token (rotation côté API).
+   * Retourne le nouvel access token, ou null si la session ne peut pas être renouvelée.
+   * Les appels concurrents partagent la même requête : un refresh token n'est utilisable qu'une fois.
+   */
+  refreshSession(): Promise<string | null> {
+    this.refreshInFlight ??= this.doRefresh().finally(() => {
+      this.refreshInFlight = null;
+    });
+    return this.refreshInFlight;
+  }
+
+  private async doRefresh(): Promise<string | null> {
+    const refreshToken = localStorage.getItem('pp_refresh_token');
+    if (!refreshToken) return null;
+    try {
+      const raw = await firstValueFrom(
+        this.http.post<{ success: boolean; data: LoginResponse; timestamp: string }>(
+          `${this.baseUrl}/refresh`,
+          { refreshToken },
+        ),
+      );
+      const result = raw.data ?? (raw as unknown as LoginResponse);
+      this.applyTokens(result);
+      return result.accessToken;
+    } catch {
+      this.clearSession();
+      return null;
+    }
+  }
+
   logout(): void {
+    // Révoque la session côté API (sans bloquer la déconnexion locale)
+    const refreshToken = localStorage.getItem('pp_refresh_token');
+    if (refreshToken) {
+      this.http.post(`${this.baseUrl}/logout`, { refreshToken }).subscribe({ error: () => undefined });
+    }
     this.clearSession();
     this.router.navigate(['/login']);
   }
@@ -142,6 +184,7 @@ export class AuthService {
     const user          = this.mapPayloadToUser(merged);
     localStorage.setItem('pp_access_token', response.accessToken);
     localStorage.setItem('pp_id_token',     response.idToken);
+    localStorage.setItem('pp_refresh_token', response.refreshToken);
     this._currentUser.set(user);
     this._accessToken.set(response.accessToken);
   }
@@ -149,6 +192,7 @@ export class AuthService {
   private clearSession(): void {
     localStorage.removeItem('pp_access_token');
     localStorage.removeItem('pp_id_token');
+    localStorage.removeItem('pp_refresh_token');
     this._currentUser.set(null);
     this._accessToken.set(null);
     this._challengePending.set(null);
@@ -181,17 +225,14 @@ export class AuthService {
       const str = String(val ?? '');
       try { return decodeURIComponent(escape(str)); } catch { return str; }
     };
-    const role = (payload['custom:role'] ?? payload['role']) as UserRole | undefined;
-    const id   = (payload['custom:userId'] ?? payload['sub']) as string;
     return {
-      id,
-      cognitoSub: payload['sub']        as string,
-      email:      payload['email']      as string,
-      firstName:  decode(payload['given_name']  ?? payload['name'] ?? ''),
-      lastName:   decode(payload['family_name'] ?? ''),
-      role:       role!,
-      region:     payload['custom:region'] ? decode(payload['custom:region']) : undefined,
-      status:     'ACTIVE',
+      id:        payload['sub']   as string,
+      email:     payload['email'] as string,
+      firstName: decode(payload['given_name']  ?? payload['name'] ?? ''),
+      lastName:  decode(payload['family_name'] ?? ''),
+      role:      payload['role'] as UserRole,
+      region:    payload['region'] ? decode(payload['region']) : undefined,
+      status:    'ACTIVE',
     };
   }
 }

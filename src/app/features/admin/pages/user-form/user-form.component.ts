@@ -33,7 +33,6 @@ export class UserFormComponent implements OnInit {
     phone:      [''],
     role:       [UserRole.PATIENT, Validators.required],
     region:     [''],
-    cognitoSub: [''],
   });
 
   async ngOnInit(): Promise<void> {
@@ -60,7 +59,7 @@ export class UserFormComponent implements OnInit {
     if (this.form.invalid) return;
     this.isLoading.set(true);
     this.error.set(null);
-    const { firstName, lastName, email, phone, role, region, cognitoSub } = this.form.getRawValue();
+    const { firstName, lastName, email, phone, role, region } = this.form.getRawValue();
     try {
       if (this.isEdit()) {
         await this.userService.update(this.id()!, {
@@ -70,7 +69,6 @@ export class UserFormComponent implements OnInit {
         }).toPromise();
       } else {
         await this.userService.create({
-          cognitoSub: cognitoSub || crypto.randomUUID(),
           email, firstName, lastName,
           phone:  phone  || undefined,
           role,

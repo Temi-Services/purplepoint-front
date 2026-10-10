@@ -1,4 +1,4 @@
-// ─── Réponse normale : tokens Cognito ────────────────────────────────────────
+// ─── Réponse normale : tokens émis par l'API ──────────────────────────────────
 export interface LoginResponse {
   accessToken:  string;
   idToken:      string;
@@ -6,7 +6,7 @@ export interface LoginResponse {
   expiresIn:    number;
 }
 
-// ─── Challenge Cognito NEW_PASSWORD_REQUIRED ──────────────────────────────────
+// ─── Challenge NEW_PASSWORD_REQUIRED (premier login) ──────────────────────────
 export interface NewPasswordChallenge {
   challenge: 'NEW_PASSWORD_REQUIRED';
   session:   string;

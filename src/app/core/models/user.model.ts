@@ -3,7 +3,6 @@ import { UserRole } from './roles.enum';
 // ─── Entité User (lecture) ────────────────────────────────────────────────────
 export interface User {
   id:         string;
-  cognitoSub: string;           // conservé en lecture (retourné par le backend)
   email:      string;
   firstName:  string;
   lastName:   string;
@@ -16,7 +15,6 @@ export interface User {
 }
 
 // ─── DTO Création (POST /users) ───────────────────────────────────────────────
-// cognitoSub retiré : le backend le gère en interne via Cognito
 export interface CreateUserDto {
   email:      string;
   firstName:  string;
