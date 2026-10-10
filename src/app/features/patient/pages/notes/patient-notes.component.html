@@ -77,14 +77,16 @@
               @if (note.audioUrl) {
                 <audio [src]="note.audioUrl" controls class="w-full h-10 rounded-lg"></audio>
               }
-              <span
-                class="inline-flex items-center gap-1.5 text-xs font-medium"
-                [class.text-success]="note.transcribed"
-                [class.text-muted]="!note.transcribed"
-              >
-                <i [class]="note.transcribed ? 'ti ti-check-circle' : 'ti ti-clock'" aria-hidden="true"></i>
-                {{ (note.transcribed ? 'PATIENT.NOTES.TRANSCRIBED' : 'PATIENT.NOTES.TRANSCRIBING') | translate }}
-              </span>
+              @if (note.transcriptionStatus === 'PENDING' || note.transcriptionStatus === 'COMPLETED') {
+                <span
+                  class="inline-flex items-center gap-1.5 text-xs font-medium"
+                  [class.text-success]="note.transcribed"
+                  [class.text-muted]="!note.transcribed"
+                >
+                  <i [class]="note.transcribed ? 'ti ti-check-circle' : 'ti ti-clock'" aria-hidden="true"></i>
+                  {{ (note.transcribed ? 'PATIENT.NOTES.TRANSCRIBED' : 'PATIENT.NOTES.TRANSCRIBING') | translate }}
+                </span>
+              }
             </div>
           }
           @if (note.appointmentId) {
